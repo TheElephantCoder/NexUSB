@@ -1,7 +1,7 @@
 #!/bin/bash
 # Remote Access Tools Menu
 
-choice=$(dialog --clear --backtitle "NexusUSB - Remote Access" \
+choice=$(dialog --clear --backtitle "NexUSB - Remote Access" \
     --title "Remote Access & Control" \
     --menu "Select a tool:" 20 70 12 \
     1 "Remmina - RDP/VNC Client" \

@@ -1,20 +1,20 @@
 #!/bin/bash
-# Download and create actual tool logos for NexusUSB
+# Download and create actual tool logos for NexUSB
 
 ICON_DIR="assets/icons"
 TOOLS_DIR="$ICON_DIR/tools"
 mkdir -p "$ICON_DIR" "$TOOLS_DIR"
 
-echo "Creating NexusUSB branding and downloading tool logos..."
+echo "Creating NexUSB branding and downloading tool logos..."
 
 # Main logo (400x80)
 convert -size 400x80 xc:transparent \
     -font "DejaVu-Sans-Bold" -pointsize 48 \
-    -fill "#66b3ff" -annotate +10+60 "Nexus" \
+    -fill "#66b3ff" -annotate +10+60 "Nex" \
     -fill "#0066cc" -annotate +200+60 "USB" \
     -stroke "#0066cc" -strokewidth 2 \
     -draw "circle 180,40 180,10" \
-    "$ICON_DIR/nexus-logo.png"
+    "$ICON_DIR/nex-logo.png"
 
 # App icon (256x256)
 convert -size 256x256 xc:transparent \
@@ -24,7 +24,7 @@ convert -size 256x256 xc:transparent \
     -annotate +60+150 "N" \
     -stroke "#ffffff" -strokewidth 3 \
     -draw "circle 128,128 128,80" \
-    "$ICON_DIR/nexus-icon.png"
+    "$ICON_DIR/nex-icon.png"
 
 # Background (1920x1080)
 convert -size 1920x1080 \
@@ -193,10 +193,10 @@ echo ""
 echo "✓ Icons created successfully!"
 echo ""
 echo "Locations:"
-echo "  - NexusUSB branding: $ICON_DIR/"
+echo "  - NexB branding: $ICON_DIR/"
 echo "  - Tool logos: $TOOLS_DIR/"
 echo ""
 echo "To use custom logos:"
 echo "  1. Replace files in $TOOLS_DIR/ with your own 64x64 PNG files"
 echo "  2. Name them exactly as shown (e.g., clamav.png, gparted.png)"
-echo "  3. Rebuild NexusUSB"
+echo "  3. Rebuild NexB"

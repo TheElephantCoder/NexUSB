@@ -7,7 +7,7 @@ TOOLS_CONF="config/windows-tools.conf"
 echo "Creating Windows tools directory..."
 mkdir -p "$WINDOWS_DIR"/{Antivirus,Recovery,SystemInfo,Utilities,Drivers,Network,Backup,Browsers,Office,Media}
 
-echo "=== NexusUSB Windows Tools Downloader ==="
+echo "=== NexUSB Windows Tools Downloader ==="
 echo ""
 
 # Function to download with progress
@@ -194,7 +194,7 @@ echo ""
 
 # Create README
 cat << 'EOF' > "$WINDOWS_DIR/README.txt"
-NexusUSB - Windows Tools Collection
+NexUSB - Windows Tools Collection
 
 AUTOMATICALLY DOWNLOADED TOOLS:
 ✓ System Info: CPU-Z, GPU-Z, CrystalDiskInfo, CrystalDiskMark, HWiNFO
@@ -222,7 +222,7 @@ USAGE:
 4. Run tools directly from USB
 
 For updates and more tools, visit:
-https://github.com/yourusername/NexusUSB
+https://github.com/yourusername/NexUSB
 EOF
 
 # Create manual download list
@@ -322,7 +322,7 @@ cat << 'SCRIPT' > "$WINDOWS_DIR/download-manual-tools.ps1"
 # PowerShell script to help download manual tools
 # Run as Administrator in Windows
 
-Write-Host "NexusUSB Manual Tools Downloader" -ForegroundColor Cyan
+Write-Host "NexUSB Manual Tools Downloader" -ForegroundColor Cyan
 Write-Host "=================================" -ForegroundColor Cyan
 Write-Host ""
 

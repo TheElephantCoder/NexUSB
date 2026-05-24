@@ -1,4 +1,4 @@
-# What's Actually Included in NexusUSB
+# What's Actually Included in NexUSB
 
 This document clarifies what tools are automatically downloaded vs what requires manual download.
 
@@ -223,7 +223,7 @@ These rescue ISOs are downloaded automatically:
 
 ## Download Helpers Included
 
-To make manual downloads easier, NexusUSB includes:
+To make manual downloads easier, NexUSB includes:
 
 1. **MANUAL_DOWNLOADS.txt** - Complete list with direct URLs
 2. **download-manual-tools.ps1** - PowerShell script to download free Windows tools

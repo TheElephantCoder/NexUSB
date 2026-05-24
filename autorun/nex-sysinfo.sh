@@ -1,7 +1,7 @@
 #!/bin/bash
 # System Information Menu
 
-choice=$(dialog --clear --backtitle "NexusUSB - System Info" \
+choice=$(dialog --clear --backtitle "NexUSB - System Info" \
     --title "System Information" \
     --menu "Select information to view:" 15 60 7 \
     1 "Hardware Summary" \

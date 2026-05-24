@@ -1,20 +1,20 @@
-# Using Windows Tools from NexusUSB
+# Using Windows Tools from NexUSB
 
 ## How Windows Tools Work
 
-NexusUSB includes Windows portable applications (like Malwarebytes, CPU-Z, etc.) that can be used in two ways:
+NexUSB includes Windows portable applications (like Malwarebytes, CPU-Z, etc.) that can be used in two ways:
 
 ### Method 1: Boot into Windows PE Environment (Recommended)
 
 **What is Windows PE?**
-Windows PE (Preinstallation Environment) is a minimal Windows system that boots from USB, similar to how NexusUSB's Linux environment works.
+Windows PE (Preinstallation Environment) is a minimal Windows system that boots from USB, similar to how NexUSB's Linux environment works.
 
-**Using Hiren's BootCD PE (Included in NexusUSB):**
+**Using Hiren's BootCD PE (Included in NexUSB):**
 
-1. Boot NexusUSB USB drive
+1. Boot NexUSB USB drive
 2. From GRUB menu, select "Hiren's BootCD PE"
 3. Boots into Windows PE environment
-4. Navigate to NexusUSB partition (usually D: or E:)
+4. Navigate to NexUSB partition (usually D: or E:)
 5. Go to `Windows-Tools` folder
 6. Run Malwarebytes or other Windows tools
 7. Scan the infected Windows installation (usually C:)
@@ -28,7 +28,7 @@ Windows PE (Preinstallation Environment) is a minimal Windows system that boots 
 ### Method 2: Boot into Infected Windows (Less Safe)
 
 1. Boot into your regular Windows installation
-2. Insert NexusUSB USB drive
+2. Insert NexUSB USB drive
 3. Navigate to USB drive in File Explorer
 4. Go to `Windows-Tools\Antivirus` folder
 5. Run Malwarebytes portable
@@ -59,9 +59,9 @@ wine /path/to/tool.exe
 
 **Step-by-step:**
 
-1. **Boot NexusUSB**
+1. **Boot NexUSB**
    - Insert USB and restart
-   - Select NexusUSB from boot menu
+   - Select NexUSB from boot menu
 
 2. **Select Hiren's BootCD PE**
    - From GRUB menu, choose "Hiren's BootCD PE"
@@ -69,7 +69,7 @@ wine /path/to/tool.exe
 
 3. **Locate Malwarebytes**
    - Open File Explorer
-   - Navigate to NexusUSB partition (D: or E:)
+   - Navigate to NexUSB partition (D: or E:)
    - Go to `Windows-Tools\Antivirus\`
    - Find `Malwarebytes.exe` or `mbam-setup.exe`
 
@@ -101,8 +101,8 @@ wine /path/to/tool.exe
 1. **Boot into Windows**
    - Boot your regular Windows (if possible)
 
-2. **Insert NexusUSB**
-   - Plug in NexusUSB drive
+2. **Insert NexUSB**
+   - Plug in NexUSB drive
    - Open in File Explorer
 
 3. **Navigate to Malwarebytes**
@@ -128,7 +128,7 @@ wine /path/to/tool.exe
 Some versions of Malwarebytes offer bootable rescue environments:
 
 1. Download Malwarebytes Bootable from another PC
-2. Add ISO to NexusUSB ISO collection
+2. Add ISO to NexUSB ISO collection
 3. Boot from Malwarebytes ISO
 4. Scan infected system
 
@@ -231,7 +231,7 @@ Some versions of Malwarebytes offer bootable rescue environments:
 - Antivirus tools
 
 **How to Access:**
-1. Boot NexusUSB
+1. Boot NexUSB
 2. Select "Hiren's BootCD PE" from menu
 3. Wait for Windows PE to load (2-3 minutes)
 4. Desktop appears with tool shortcuts
@@ -240,7 +240,7 @@ Some versions of Malwarebytes offer bootable rescue environments:
 - Malwarebytes
 - AdwCleaner
 - Many tools already included
-- Plus access to NexusUSB Windows-Tools partition
+- Plus access to NexUSB Windows-Tools partition
 
 **Network Access:**
 - Windows PE includes network drivers
@@ -268,17 +268,17 @@ Some versions of Malwarebytes offer bootable rescue environments:
 
 ## Workflow: Complete Malware Removal
 
-**Step 1: Boot NexusUSB Linux**
-1. Boot NexusUSB
-2. Select "NexusUSB Live Environment"
+**Step 1: Boot NexUSB Linux**
+1. Boot NexUSB
+2. Select "NexUSB Live Environment"
 3. Run ClamAV scan from Security menu
 4. Remove detected threats
 5. Note any suspicious files
 
 **Step 2: Boot Hiren's BootCD PE**
-1. Reboot NexusUSB
+1. Reboot NexUSB
 2. Select "Hiren's BootCD PE"
-3. Run Malwarebytes from NexusUSB partition
+3. Run Malwarebytes from NexUSB partition
 4. Scan C: drive
 5. Remove additional threats
 
@@ -325,7 +325,7 @@ Some versions of Malwarebytes offer bootable rescue environments:
    - Utilities
    - Network
 
-4. Rebuild NexusUSB or copy directly to USB
+4. Rebuild NexUSB or copy directly to USB
 
 ## Best Practices
 
@@ -350,7 +350,7 @@ Some versions of Malwarebytes offer bootable rescue environments:
 
 ## Summary
 
-**Windows tools in NexusUSB work best when:**
+**Windows tools in NexUSB work best when:**
 - Used from Hiren's BootCD PE environment
 - Scanning offline Windows installations
 - Combined with Linux-based ClamAV scanning

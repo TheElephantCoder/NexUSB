@@ -1,4 +1,4 @@
-# Flashing NexusUSB to USB Drive
+# Flashing NexUSB to USB Drive
 
 ## Method 1: Ventoy (Recommended)
 
@@ -13,12 +13,12 @@ Ventoy allows you to copy multiple ISOs to a single USB drive and boot from them
    ```
    Replace `/dev/sdX` with your USB device
 
-3. Copy NexusUSB.iso to the USB drive:
+3. Copy NexUSB.iso to the USB drive:
    ```bash
-   cp dist/NexusUSB.iso /path/to/usb/
+   cp dist/NexUSB.iso /path/to/usb/
    ```
 
-4. Boot from USB and select NexusUSB from Ventoy menu
+4. Boot from USB and select NexUSB from Ventoy menu
 
 ### Advantages
 - Keep multiple ISOs on one USB
@@ -31,7 +31,7 @@ Ventoy allows you to copy multiple ISOs to a single USB drive and boot from them
 2. Insert your USB drive
 3. Open Rufus
 4. Select your USB device
-5. Click "SELECT" and choose NexusUSB.iso
+5. Click "SELECT" and choose NexUSB.iso
 6. Partition scheme: GPT (for UEFI) or MBR (for Legacy BIOS)
 7. Click "START"
 
@@ -39,12 +39,12 @@ Ventoy allows you to copy multiple ISOs to a single USB drive and boot from them
 
 ### Linux
 ```bash
-sudo dd if=dist/NexusUSB.iso of=/dev/sdX bs=4M status=progress && sync
+sudo dd if=dist/NexUSB.iso of=/dev/sdX bs=4M status=progress && sync
 ```
 
 ### macOS
 ```bash
-sudo dd if=dist/NexusUSB.iso of=/dev/rdiskX bs=1m
+sudo dd if=dist/NexUSB.iso of=/dev/rdiskX bs=1m
 ```
 
 Replace `/dev/sdX` or `/dev/rdiskX` with your USB device.
@@ -64,7 +64,7 @@ diskutil list
 ## Method 4: Etcher (Cross-platform)
 
 1. Download balenaEtcher from https://www.balena.io/etcher/
-2. Select NexusUSB.iso
+2. Select NexUSB.iso
 3. Select your USB drive
 4. Click "Flash!"
 
@@ -76,7 +76,7 @@ After flashing, verify the USB is bootable:
 2. Reboot your computer
 3. Enter BIOS/UEFI boot menu (F2, F12, Del, or Esc)
 4. Select the USB drive
-5. You should see the NexusUSB boot menu
+5. You should see the NexUSB boot menu
 
 ## Troubleshooting
 

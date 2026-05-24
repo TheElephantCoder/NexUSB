@@ -1,5 +1,5 @@
 #!/bin/bash
-# Automated logo downloader and generator for NexusUSB
+# Automated logo downloader and generator for NexUSB
 # This script downloads actual logos and creates fallbacks
 
 ICON_DIR="assets/icons"
@@ -7,7 +7,7 @@ TOOLS_DIR="$ICON_DIR/tools"
 mkdir -p "$ICON_DIR" "$TOOLS_DIR"
 
 echo "=========================================="
-echo "  NexusUSB Logo Downloader & Generator"
+echo "  NexUSB Logo Downloader & Generator"
 echo "=========================================="
 echo ""
 
@@ -127,12 +127,12 @@ create_fallback "baobab" "DU" "#cc3300"
 
 echo ""
 echo "=========================================="
-echo "  Creating NexusUSB Branding"
+echo "  Creating NexUSB Branding"
 echo "=========================================="
 echo ""
 
 # Main logo (400x80)
-echo "Creating NexusUSB logo..."
+echo "Creating NexUSB logo..."
 convert -size 400x80 xc:none \
     -font "DejaVu-Sans-Bold" -pointsize 48 \
     -fill "#66b3ff" -annotate +10+60 "Nexus" \
@@ -199,7 +199,7 @@ echo "=========================================="
 echo "  Summary"
 echo "=========================================="
 echo ""
-echo "✓ NexusUSB branding created"
+echo "✓ NexUSB branding created"
 echo "✓ Tool logos downloaded/generated"
 echo "✓ Category icons created"
 echo "✓ GRUB theme elements created"
@@ -213,5 +213,5 @@ echo ""
 echo "To customize:"
 echo "  1. Replace any PNG file in $TOOLS_DIR/"
 echo "  2. Keep 64x64 size for consistency"
-echo "  3. Rebuild NexusUSB"
+echo "  3. Rebuild NexUSB"
 echo ""

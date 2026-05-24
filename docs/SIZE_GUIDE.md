@@ -1,4 +1,4 @@
-# NexusUSB Size Guide
+# NexUSB Size Guide
 
 ## Size Breakdown
 
@@ -11,7 +11,7 @@
 - Free space: 1.5GB
 
 **Includes:**
-- NexusUSB live environment
+- NexUSB live environment
 - Basic malware scanning (ClamAV)
 - System recovery (TestDisk, PhotoRec)
 - Disk tools (GParted)

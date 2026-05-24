@@ -1,4 +1,4 @@
-# Building NexusUSB
+# Building NexUSB
 
 ## Prerequisites
 
@@ -17,13 +17,13 @@ sudo apt install -y grub-pc-bin grub-efi-amd64-bin xorriso squashfs-tools mtools
 
 ```bash
 # Clone the repository
-git clone https://github.com/TheElephantCoder/NexusUSB.git
-cd NexusUSB
+git clone https://github.com/TheElephantCoder/NexUSB.git
+cd NexUSB
 
 # Run the build script
 sudo ./build.sh
 
-# Output will be in dist/NexusUSB.iso
+# Output will be in dist/NexUSB.iso
 ```
 
 ## Customization
@@ -36,10 +36,10 @@ Edit `theme/` directory to customize the boot menu appearance
 ### Using Ventoy (Recommended)
 1. Install Ventoy on your USB drive
 2. Copy the ISO to the USB drive
-3. Boot and select NexusUSB
+3. Boot and select NexUSB
 
 ### Using Rufus
 1. Open Rufus
 2. Select your USB drive
-3. Select the NexusUSB.iso
+3. Select the NexUSB.iso
 4. Click Start

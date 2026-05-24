@@ -1,7 +1,7 @@
 #!/bin/bash
 # Password Tools Menu
 
-choice=$(dialog --clear --backtitle "NexusUSB - Password Tools" \
+choice=$(dialog --clear --backtitle "NexUSB - Password Tools" \
     --title "Password Reset & Recovery" \
     --menu "Select a tool:" 12 60 4 \
     1 "chntpw - Windows Password Reset" \

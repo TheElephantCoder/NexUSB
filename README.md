@@ -1,4 +1,4 @@
-# NexusUSB
+# NexUSB
 
 <div align="center">
 
@@ -17,9 +17,9 @@
 
 ---
 
-## 🚀 What is NexusUSB?
+## 🚀 What is NexUSB?
 
-NexusUSB is a comprehensive, open-source bootable USB toolkit that combines a live Linux environment with Windows PE integration, providing access to 150+ professional tools for:
+NexUSB is a comprehensive, open-source bootable USB toolkit that combines a live Linux environment with Windows PE integration, providing access to 150+ professional tools for:
 
 - **🛡️ Malware Scanning** - ClamAV, chkrootkit, rkhunter, and Windows antivirus tools
 - **💾 Data Recovery** - TestDisk, PhotoRec, ddrescue, and file carving tools
@@ -100,7 +100,7 @@ make icons
 make minimal
 
 # 5. Flash to USB
-sudo dd if=dist/NexusUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
+sudo dd if=dist/NexUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
 ```
 
 **That's it!** Boot from USB and start rescuing systems.
@@ -120,7 +120,7 @@ For detailed instructions, see [QUICKSTART.md](QUICKSTART.md).
 
 ## 🛠️ What Gets Downloaded Automatically
 
-When you run the build, NexusUSB automatically:
+When you run the build, NexUSB automatically:
 
 ✅ Installs 150+ Linux tools from Ubuntu repositories  
 ✅ Downloads 30+ Windows portable applications  
@@ -134,7 +134,7 @@ Additional tools and ISOs can be added manually. See [What's Included](docs/WHAT
 
 ## 🔒 Malware Scanning
 
-NexusUSB provides professional-grade malware scanning:
+NexUSB provides professional-grade malware scanning:
 
 **Linux Environment:**
 - ClamAV (8+ million signatures)
@@ -164,7 +164,7 @@ Built-in remote access tools for remote troubleshooting:
 - **TeamViewer** - Remote support software
 - **AnyDesk** - Remote desktop application
 
-**Use case:** Boot a broken machine with NexusUSB, connect to network, start RDP server, and troubleshoot remotely from your desk!
+**Use case:** Boot a broken machine with NexUSB, connect to network, start RDP server, and troubleshoot remotely from your desk!
 
 ## 💻 System Requirements
 
@@ -199,7 +199,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📋 Comparison
 
-| Feature | NexusUSB | Medicat USB | Hiren's BootCD | SystemRescue |
+| Feature | NexUSB | Medicat USB | Hiren's BootCD | SystemRescue |
 |---------|-----------|-------------|----------------|--------------|
 | **Open Source** | ✅ Yes | ❌ No | ⚠️ Partial | ✅ Yes |
 | **Linux Tools** | 150+ | Limited | Limited | 50+ |
@@ -213,7 +213,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📜 License
 
-NexusUSB is released under the [MIT License](LICENSE).
+NexUSB is released under the [MIT License](LICENSE).
 
 **You are free to:**
 - Use commercially
@@ -246,8 +246,8 @@ NexusUSB is released under the [MIT License](LICENSE).
 
 ## 📞 Support
 
-- **Issues:** [GitHub Issues](https://github.com/TheElephantCoder/NexusUSB/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/TheElephantCoder/NexusUSB/discussions)
+- **Issues:** [GitHub Issues](https://github.com/TheElephantCoder/NexUSB/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/TheElephantCoder/NexUSB/discussions)
 - **Documentation:** [docs/](docs/) directory
 - **FAQ:** [docs/FAQ.md](docs/FAQ.md)
 
@@ -264,7 +264,7 @@ See [ROADMAP.md](ROADMAP.md) for planned features and future development.
 
 ## ⭐ Star History
 
-If you find NexusUSB useful, please consider giving it a star on GitHub!
+If you find NexUSB useful, please consider giving it a star on GitHub!
 
 ---
 
@@ -272,7 +272,7 @@ If you find NexusUSB useful, please consider giving it a star on GitHub!
 
 **Made with ❤️ by TheElephantCoder**
 
-[GitHub](https://github.com/TheElephantCoder/NexusUSB) • [Documentation](docs/)
+[GitHub](https://github.com/TheElephantCoder/NexUSB) • [Documentation](docs/)
 
 </div>
 
@@ -353,7 +353,7 @@ sudo apt install -y debootstrap grub-pc-bin grub-efi-amd64-bin xorriso \
 sudo ./build-minimal.sh
 
 # Flash to USB
-sudo dd if=dist/NexusUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
+sudo dd if=dist/NexUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
 ```
 
 **Minimal ISO includes:**
@@ -371,8 +371,8 @@ sudo dd if=dist/NexusUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
 # Build full system (32GB default)
 sudo ./build.sh 32
 
-# Output: dist/NexusUSB.img
-sudo dd if=dist/NexusUSB.img of=/dev/sdX bs=4M status=progress
+# Output: dist/NexUSB.img
+sudo dd if=dist/NexUSB.img of=/dev/sdX bs=4M status=progress
 ```
 
 **Full build includes:**
@@ -394,7 +394,7 @@ sudo dd if=dist/NexusUSB.img of=/dev/sdX bs=4M status=progress
 
 ## What Gets Downloaded Automatically
 
-When you run `./build.sh`, NexusUSB automatically:
+When you run `./build.sh`, NexUSB automatically:
 
 - Installs 150+ Linux tools from Ubuntu repositories
 - Downloads 30+ Windows portable applications
@@ -426,7 +426,7 @@ Additional tools and ISOs can be added manually (see [What's Included](docs/WHAT
 ## Project Structure
 
 ```
-NexusUSB/
+NexUSB/
 ├── build.sh              # Main build script (full build)
 ├── build-minimal.sh      # Minimal ISO builder (2GB)
 ├── config/
@@ -457,7 +457,7 @@ NexusUSB/
 
 ### Multi-Partition Layout
 1. **Boot Partition (512MB)** - EFI/GRUB bootloader
-2. **NexusUSB Live (8GB)** - Linux environment with tools
+2. **NexUSB Live (8GB)** - Linux environment with tools
 3. **Windows Tools (8GB)** - Portable Windows applications
 4. **ISO Collection (remaining)** - Multiboot ISO library
 
@@ -502,7 +502,7 @@ Place ISO files in `build/isos/` organized by category:
 Edit files in `theme/nexus/`:
 - `theme.txt` - Colors and layout
 - `background.png` - Boot background
-- `logo.png` - NexusUSB logo
+- `logo.png` - NexUSB logo
 
 ## Contributing
 

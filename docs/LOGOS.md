@@ -1,8 +1,8 @@
-# NexusUSB Logo System
+# NexUSB Logo System
 
 ## Automated Logo Download
 
-NexusUSB automatically downloads and generates professional logos for all tools during the build process.
+NexUSB automatically downloads and generates professional logos for all tools during the build process.
 
 ## How It Works
 
@@ -20,7 +20,7 @@ When you run `./build.sh` or `./build-minimal.sh`, the system:
    - Color-coded by category
    - Consistent 64x64 size
 
-3. **Generates Branding** - Creates NexusUSB branding:
+3. **Generates Branding** - Creates NexUSB branding:
    - Main logo (400x80)
    - App icon (256x256)
    - Background wallpaper (1920x1080)
@@ -86,7 +86,7 @@ When you run `./build.sh` or `./build-minimal.sh`, the system:
 1. Create your own 64x64 PNG logo
 2. Name it exactly as the tool (e.g., `clamav.png`, `gparted.png`)
 3. Place in `assets/icons/tools/`
-4. Rebuild NexusUSB
+4. Rebuild NexUSB
 
 Example:
 ```bash
@@ -97,7 +97,7 @@ convert your-logo.png -resize 64x64 assets/icons/tools/clamav.png
 sudo ./build.sh
 ```
 
-### Replace NexusUSB Branding
+### Replace NexUSB Branding
 
 Replace these files before building:
 ```

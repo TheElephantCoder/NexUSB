@@ -1,7 +1,7 @@
 #!/bin/bash
 # Disk Management Menu
 
-choice=$(dialog --clear --backtitle "NexusUSB - Disk Tools" \
+choice=$(dialog --clear --backtitle "NexUSB - Disk Tools" \
     --title "Disk Management" \
     --menu "Select a tool:" 15 60 6 \
     1 "GParted - Partition Editor (GUI)" \

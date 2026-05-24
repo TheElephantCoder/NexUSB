@@ -1,11 +1,11 @@
 #!/bin/bash
-# NexusUSB Main Menu
+# NexUSB Main Menu
 
 DIALOG_HEIGHT=20
 DIALOG_WIDTH=70
 
 while true; do
-    choice=$(dialog --clear --backtitle "NexusUSB v1.0" \
+    choice=$(dialog --clear --backtitle "NexUSB v1.0" \
         --title "Main Menu" \
         --menu "Select a category:" $DIALOG_HEIGHT $DIALOG_WIDTH 12 \
         1 "Malware Scanning & Security" \

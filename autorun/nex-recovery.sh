@@ -1,7 +1,7 @@
 #!/bin/bash
 # System Recovery Menu
 
-choice=$(dialog --clear --backtitle "NexusUSB - Recovery" \
+choice=$(dialog --clear --backtitle "NexUSB - Recovery" \
     --title "System Recovery & Repair" \
     --menu "Select a tool:" 15 60 7 \
     1 "TestDisk - Partition Recovery" \

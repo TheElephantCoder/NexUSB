@@ -6,7 +6,7 @@ ISO_CONF="config/iso-collection.conf"
 
 mkdir -p "$ISO_DIR"/{Linux,Security,Rescue,Antivirus,Windows,Tools}
 
-echo "=== NexusUSB ISO Downloader ==="
+echo "=== NexUSB ISO Downloader ==="
 echo ""
 
 # Function to download ISO
@@ -217,7 +217,7 @@ EOF
 
 # Create README
 cat << 'EOF' > "$ISO_DIR/README.txt"
-NexusUSB - ISO Collection
+NexUSB - ISO Collection
 
 AUTOMATICALLY DOWNLOADED (Essential Rescue Tools):
 ✓ SystemRescue - Complete rescue toolkit
@@ -242,20 +242,20 @@ DIRECTORY STRUCTURE:
 ADDING MORE ISOs:
 1. Download ISOs (see MANUAL_DOWNLOADS.txt)
 2. Place in appropriate directory
-3. Rebuild NexusUSB or copy directly to USB
+3. Rebuild NexUSB or copy directly to USB
 
 MULTIBOOT:
 All ISOs in these directories will be automatically
 detected and added to the boot menu.
 
 USAGE:
-1. Boot from NexusUSB USB drive
+1. Boot from NexUSB USB drive
 2. Select "ISO Collection" from main menu
 3. Choose the ISO you want to boot
 4. Follow the ISO's boot instructions
 
 For more information:
-https://github.com/yourusername/NexusUSB
+https://github.com/yourusername/NexUSB
 EOF
 
 # Create download helper script

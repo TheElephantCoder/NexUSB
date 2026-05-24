@@ -1,5 +1,5 @@
 #!/bin/bash
-# NexusUSB Full Build Script
+# NexUSB Full Build Script
 # Builds complete bootable USB system with all tools
 
 set -e
@@ -8,8 +8,8 @@ set -o pipefail
 # Configuration
 BUILD_DIR="build"
 DIST_DIR="dist"
-ISO_NAME="NexusUSB.iso"
-IMG_NAME="NexusUSB.img"
+ISO_NAME="NexUSB.iso"
+IMG_NAME="NexUSB.img"
 WORK_DIR="$BUILD_DIR/work"
 ISO_DIR="$BUILD_DIR/iso"
 USB_SIZE=${1:-32}  # Default 32GB, can specify different size
@@ -44,7 +44,7 @@ trap cleanup EXIT
 
 # Banner
 echo "╔════════════════════════════════════════════════════════╗"
-echo "║           NexusUSB Full Build System                 ║"
+echo "║           NexUSB Full Build System                 ║"
 echo "║     Professional Bootable USB Rescue Toolkit           ║"
 echo "╚════════════════════════════════════════════════════════╝"
 echo ""
@@ -80,7 +80,7 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 # Start logging
-log "=== NexusUSB Build Started ==="
+log "=== NexUSB Build Started ==="
 log "Configuration: ${USB_SIZE}GB target size"
 
 echo -e "${BLUE}[1/10] Cleaning previous builds...${NC}"
@@ -130,7 +130,7 @@ cd ..
 
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║          NexusUSB Build Complete!                     ║${NC}"
+echo -e "${GREEN}║          NexUSB Build Complete!                     ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo "Output files:"
@@ -162,7 +162,7 @@ IMG_SIZE=$(du -h "$DIST_DIR/$IMG_NAME" 2>/dev/null | cut -f1 || echo "N/A")
 
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║          NexusUSB Build Complete!                    ║${NC}"
+echo -e "${GREEN}║          NexUSB Build Complete!                    ║${NC}"
 echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo "Output files:"

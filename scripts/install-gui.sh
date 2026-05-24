@@ -21,7 +21,7 @@ chroot "$WORK_DIR" apt install -y \
     wget
 
 # Create icons directory
-mkdir -p "$WORK_DIR/usr/share/NexusUSB/icons/tools"
+mkdir -p "$WORK_DIR/usr/share/NexUSB/icons/tools"
 
 # Run icon creation script
 echo "Downloading and creating tool logos..."
@@ -33,26 +33,26 @@ else
 fi
 
 # Copy GUI application
-mkdir -p "$WORK_DIR/usr/share/NexusUSB"
-cp -r gui/* "$WORK_DIR/usr/share/NexusUSB/"
-chmod +x "$WORK_DIR/usr/share/NexusUSB/nexus-gui.py"
+mkdir -p "$WORK_DIR/usr/share/NexUSB"
+cp -r gui/* "$WORK_DIR/usr/share/NexUSB/"
+chmod +x "$WORK_DIR/usr/share/NexUSB/nexus-gui.py"
 
 # Copy icons
 if [ -d "assets/icons" ]; then
-    cp -r assets/icons/* "$WORK_DIR/usr/share/NexusUSB/icons/"
+    cp -r assets/icons/* "$WORK_DIR/usr/share/NexUSB/icons/"
 else
     echo "Warning: Icons directory not found"
 fi
 
 # Create desktop entry
-cat > "$WORK_DIR/usr/share/applications/NexusUSB.desktop" << 'EOF'
+cat > "$WORK_DIR/usr/share/applications/NexUSB.desktop" << 'EOF'
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=NexusUSB Toolkit
+Name=NexUSB Toolkit
 Comment=Professional System Rescue & Recovery
-Exec=/usr/share/NexusUSB/nexus-gui.py
-Icon=/usr/share/NexusUSB/icons/nexus-icon.png
+Exec=/usr/share/NexUSB/nexus-gui.py
+Icon=/usr/share/NexUSB/icons/nexus-icon.png
 Terminal=false
 Categories=System;Utility;
 Keywords=rescue;recovery;malware;disk;network;
@@ -60,17 +60,17 @@ EOF
 
 # Set GUI to auto-start
 mkdir -p "$WORK_DIR/etc/xdg/autostart"
-cp "$WORK_DIR/usr/share/applications/NexusUSB.desktop" \
+cp "$WORK_DIR/usr/share/applications/NexUSB.desktop" \
    "$WORK_DIR/etc/xdg/autostart/"
 
 # Configure Openbox to launch GUI
 mkdir -p "$WORK_DIR/etc/xdg/openbox"
 cat > "$WORK_DIR/etc/xdg/openbox/autostart" << 'EOF'
 # Set wallpaper
-feh --bg-scale /usr/share/NexusUSB/icons/background.png &
+feh --bg-scale /usr/share/NexUSB/icons/background.png &
 
-# Launch NexusUSB GUI
-/usr/share/NexusUSB/nexus-gui.py &
+# Launch NexUSB GUI
+/usr/share/NexUSB/nexus-gui.py &
 EOF
 
 echo "Professional GUI installed"
