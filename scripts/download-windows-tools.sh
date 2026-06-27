@@ -18,7 +18,7 @@ download_tool() {
     local category="$4"
     
     echo "Downloading: $name"
-    if wget --progress=bar:force -O "$WINDOWS_DIR/$category/$output" "$url" 2>&1 | grep --line-buffered -oP '\d+%'; then
+    if wget --progress=bar:force -O "$WINDOWS_DIR/$category/$output" "$url"; then
         echo "✓ $name downloaded successfully"
         return 0
     else

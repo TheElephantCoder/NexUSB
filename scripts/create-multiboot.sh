@@ -9,7 +9,7 @@ echo "Size: ${SIZE_GB}GB"
 
 # Calculate partition sizes
 BOOT_SIZE=512M
-NEXUS_SIZE=8G
+NEX_SIZE=8G
 WINDOWS_SIZE=8G
 ISO_SIZE=$((SIZE_GB - 16))G
 DATA_SIZE=remaining
@@ -39,12 +39,34 @@ parted "$OUTPUT_IMG" print
 
 # Setup loop device
 LOOP_DEV=$(losetup -f --show "$OUTPUT_IMG")
+if [ -z "$LOOP_DEV" ]; then
+    echo "Error: Failed to create loop device"
+    exit 1
+fi
+echo "Created loop device: $LOOP_DEV"
+
 partprobe "$LOOP_DEV"
+
+# Wait for the kernel to create the partition device nodes before formatting
+echo "Waiting for partition devices..."
+for i in 1 2 3 4; do
+    part="${LOOP_DEV}p${i}"
+    timeout=10
+    while [ ! -b "$part" ] && [ "$timeout" -gt 0 ]; do
+        sleep 1
+        timeout=$((timeout - 1))
+    done
+    if [ ! -b "$part" ]; then
+        echo "Error: Partition $part did not appear in time"
+        losetup -d "$LOOP_DEV"
+        exit 1
+    fi
+done
 
 # Format partitions
 echo "Formatting partitions..."
-mkfs.vfat -F32 -n "NEXUSBOOT" "${LOOP_DEV}p1"
-mkfs.ext4 -L "NEXUSLIVE" "${LOOP_DEV}p2"
+mkfs.vfat -F32 -n "NEXBOOT" "${LOOP_DEV}p1"
+mkfs.ext4 -L "NEXLIVE" "${LOOP_DEV}p2"
 mkfs.ntfs -f -L "WINTOOLS" "${LOOP_DEV}p3"
 mkfs.exfat -n "ISOS" "${LOOP_DEV}p4"
 

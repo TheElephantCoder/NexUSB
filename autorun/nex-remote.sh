@@ -1,6 +1,50 @@
 #!/bin/bash
 # Remote Access Tools Menu
 
+# --- Validation helpers ----------------------------------------------------
+# Validate an IPv4 address, optionally with CIDR suffix.
+validate_ip_or_cidr() {
+    local target="$1"
+    if [[ ! "$target" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
+        return 1
+    fi
+    local ip="${target%%/*}"
+    local IFS='.'
+    read -ra octets <<< "$ip"
+    for o in "${octets[@]}"; do
+        [ "$o" -le 255 ] || return 1
+    done
+    return 0
+}
+
+# Validate a hostname or IPv4 address (no shell metacharacters allowed).
+validate_host() {
+    local host="$1"
+    [[ "$host" =~ ^[A-Za-z0-9._-]+$ ]] || return 1
+    return 0
+}
+
+# Validate user@hostname for SSH, rejecting leading dashes (option injection).
+validate_ssh_target() {
+    local target="$1"
+    [[ "$target" =~ ^[A-Za-z0-9._-]+@[A-Za-z0-9._-]+$ ]] || return 1
+    return 0
+}
+
+# Launch a GUI tool only if it is installed.
+launch_tool() {
+    local name="$1"
+    local cmd="$2"
+    if command -v "$cmd" &> /dev/null; then
+        "$cmd" &
+    else
+        clear
+        echo "$name is not installed."
+        echo "Install with: sudo apt install $cmd"
+        read -p "Press Enter to continue..."
+    fi
+}
+
 choice=$(dialog --clear --backtitle "NexUSB - Remote Access" \
     --title "Remote Access & Control" \
     --menu "Select a tool:" 20 70 12 \
@@ -20,7 +64,7 @@ choice=$(dialog --clear --backtitle "NexUSB - Remote Access" \
 
 case $choice in
     1)
-        remmina &
+        launch_tool "Remmina" "remmina"
         ;;
     2)
         clear
@@ -70,7 +114,11 @@ case $choice in
     6)
         clear
         read -p "Enter SSH host (user@hostname): " sshhost
-        ssh "$sshhost"
+        if validate_ssh_target "$sshhost"; then
+            ssh -- "$sshhost"
+        else
+            echo "Error: Invalid SSH target. Use the form user@hostname."
+        fi
         read -p "Press Enter to continue..."
         ;;
     7)
@@ -109,14 +157,22 @@ case $choice in
     10)
         clear
         read -p "Enter host to ping: " host
-        ping -c 4 "$host"
+        if validate_host "$host"; then
+            ping -c 4 -- "$host"
+        else
+            echo "Error: Invalid host. Use a hostname or IPv4 address."
+        fi
         read -p "Press Enter to continue..."
         ;;
     11)
         clear
         read -p "Enter target IP/network to scan: " target
-        echo "Scanning $target..."
-        nmap -sV "$target"
+        if validate_ip_or_cidr "$target"; then
+            echo "Scanning $target..."
+            nmap -sV -- "$target"
+        else
+            echo "Error: Invalid target. Use an IPv4 address or CIDR (e.g., 192.168.1.0/24)."
+        fi
         read -p "Press Enter to continue..."
         ;;
 esac

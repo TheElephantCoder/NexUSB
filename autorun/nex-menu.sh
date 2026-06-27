@@ -22,13 +22,13 @@ while true; do
         2>&1 >/dev/tty)
 
     case $choice in
-        1) /usr/local/bin/nexus-security.sh ;;
-        2) /usr/local/bin/nexus-recovery.sh ;;
-        3) /usr/local/bin/nexus-disk.sh ;;
-        4) /usr/local/bin/nexus-password.sh ;;
-        5) /usr/local/bin/nexus-network.sh ;;
-        6) /usr/local/bin/nexus-remote.sh ;;
-        7) /usr/local/bin/nexus-sysinfo.sh ;;
+        1) /usr/local/bin/nex-security.sh ;;
+        2) /usr/local/bin/nex-recovery.sh ;;
+        3) /usr/local/bin/nex-disk.sh ;;
+        4) /usr/local/bin/nex-password.sh ;;
+        5) /usr/local/bin/nex-network.sh ;;
+        6) /usr/local/bin/nex-remote.sh ;;
+        7) /usr/local/bin/nex-sysinfo.sh ;;
         8) pcmanfm & ;;
         9) lxterminal & ;;
         10) reboot ;;

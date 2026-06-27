@@ -79,6 +79,7 @@ echo ""
 # Check disk space
 echo "Checking disk space..."
 AVAILABLE=$(df -BG . | tail -1 | awk '{print $4}' | sed 's/G//')
+AVAILABLE=${AVAILABLE:-0}
 if [ "$AVAILABLE" -ge 50 ]; then
     echo -e "${GREEN}✓${NC} $AVAILABLE GB available (50+ GB recommended)"
 elif [ "$AVAILABLE" -ge 20 ]; then
@@ -93,6 +94,7 @@ echo ""
 # Check memory
 echo "Checking system memory..."
 TOTAL_MEM=$(free -g | awk '/^Mem:/{print $2}')
+TOTAL_MEM=${TOTAL_MEM:-0}
 if [ "$TOTAL_MEM" -ge 4 ]; then
     echo -e "${GREEN}✓${NC} ${TOTAL_MEM}GB RAM (4+ GB recommended)"
 elif [ "$TOTAL_MEM" -ge 2 ]; then
@@ -145,10 +147,10 @@ echo ""
 
 # Summary
 echo "=== Summary ==="
-if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
+if [ "$ERRORS" -eq 0 ] && [ "$WARNINGS" -eq 0 ]; then
     echo -e "${GREEN}✓ Environment is ready for building NexUSB${NC}"
     exit 0
-elif [ $ERRORS -eq 0 ]; then
+elif [ "$ERRORS" -eq 0 ]; then
     echo -e "${YELLOW}⚠ Environment is ready with $WARNINGS warning(s)${NC}"
     exit 0
 else

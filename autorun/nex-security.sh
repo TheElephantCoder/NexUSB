@@ -4,8 +4,13 @@
 
 DIALOG_HEIGHT=22
 DIALOG_WIDTH=75
-SCAN_LOG_DIR="/home/nexus-scans"
+SCAN_LOG_DIR="/home/nex-scans"
 mkdir -p "$SCAN_LOG_DIR"
+
+# Secure temporary file for parsing scan output (unique, owner-only, auto-cleaned)
+TEMP_SCAN_OUTPUT=$(mktemp /tmp/nex-scan.XXXXXXXXXX)
+chmod 600 "$TEMP_SCAN_OUTPUT"
+trap 'rm -f "$TEMP_SCAN_OUTPUT"' EXIT INT TERM
 
 # Colors for output
 RED='\033[0;31m'
@@ -13,6 +18,20 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
+
+# Validate a partition device name (e.g. /dev/sda2, /dev/nvme0n1p3)
+validate_partition() {
+    local part="$1"
+    if [[ ! "$part" =~ ^/dev/(sd[a-z][0-9]+|nvme[0-9]+n[0-9]+p[0-9]+|vd[a-z][0-9]+)$ ]]; then
+        echo -e "${RED}Error: Invalid partition name format: '$part'${NC}"
+        return 1
+    fi
+    if [ ! -b "$part" ]; then
+        echo -e "${RED}Error: $part does not exist or is not a block device${NC}"
+        return 1
+    fi
+    return 0
+}
 
 # Function to show scan progress
 show_progress() {
@@ -32,19 +51,20 @@ show_result() {
 while true; do
     choice=$(dialog --clear --backtitle "NexUSB - Professional Malware Scanner" \
         --title "🛡️  Security & Malware Scanning" \
-        --menu "Select scanning option:" $DIALOG_HEIGHT $DIALOG_WIDTH 13 \
+        --menu "Select scanning option:" $DIALOG_HEIGHT $DIALOG_WIDTH 14 \
         1 "🖥️  Auto-Scan Windows (Recommended)" \
         2 "🐧 Auto-Scan Linux" \
         3 "⚡ Quick Scan (5-10 min)" \
         4 "🔍 Deep Scan (1-2 hours)" \
         5 "📁 Custom Folder Scan" \
-        6 "🦠 Rootkit Detection" \
-        7 "🔐 Security Audit" \
-        8 "🔄 Update Virus Definitions" \
-        9 "📊 View Scan Reports" \
-        10 "💾 Quarantine Manager" \
-        11 "🔧 Mount Drive Manually" \
-        12 "ℹ️  Scan Statistics" \
+        6 "🦠 Rootkit Detection (chkrootkit)" \
+        7 "🔍 Advanced Rootkit Hunter (rkhunter)" \
+        8 "🔐 Security Audit (Lynis)" \
+        9 "🔄 Update Virus Definitions" \
+        10 "📊 View Scan Reports" \
+        11 "💾 Quarantine Manager" \
+        12 "🔧 Mount Drive Manually" \
+        13 "ℹ️  Scan Statistics" \
         0 "← Back to Main Menu" \
         2>&1 >/dev/tty)
 
@@ -100,11 +120,11 @@ while true; do
                         --exclude-dir="^/mnt/windows-scan/Windows/WinSxS" \
                         --exclude-dir="^/mnt/windows-scan/\$Recycle.Bin" \
                         --log="$LOG_FILE" \
-                        "$MOUNT_POINT" | tee /tmp/scan_output.txt
+                        "$MOUNT_POINT" | tee "$TEMP_SCAN_OUTPUT"
                     
                     # Parse results
-                    INFECTED=$(grep "Infected files:" /tmp/scan_output.txt | awk '{print $3}')
-                    SCANNED=$(grep "Scanned files:" /tmp/scan_output.txt | awk '{print $3}')
+                    INFECTED=$(grep "Infected files:" "$TEMP_SCAN_OUTPUT" | awk '{print $3}')
+                    SCANNED=$(grep "Scanned files:" "$TEMP_SCAN_OUTPUT" | awk '{print $3}')
                     
                     echo ""
                     echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
@@ -142,12 +162,10 @@ while true; do
             echo ""
             read -p "Enter Linux partition (e.g., /dev/sda2): " part
             
-            if [ -n "$part" ]; then
+            if [ -n "$part" ] && validate_partition "$part"; then
                 echo "Mounting $part..."
                 mkdir -p /mnt/linux-scan
-                mount "$part" /mnt/linux-scan 2>/dev/null
-                
-                if [ $? -eq 0 ]; then
+                if mount "$part" /mnt/linux-scan 2>/dev/null; then
                     echo ""
                     echo "Updating virus definitions..."
                     freshclam
@@ -263,7 +281,7 @@ while true; do
             echo "Audit complete! Log saved to /home/lynis.log"
             read -p "Press Enter to continue..."
             ;;
-        8)
+        9)
             clear
             echo -e "${BLUE}╔════════════════════════════════════════════════════════╗${NC}"
             echo -e "${BLUE}║           Update Virus Definitions                     ║${NC}"
@@ -289,7 +307,7 @@ while true; do
             read -p "Press Enter to continue..."
             ;;
         
-        10)
+        11)
             clear
             echo -e "${BLUE}╔════════════════════════════════════════════════════════╗${NC}"
             echo -e "${BLUE}║              Quarantine Manager                        ║${NC}"
@@ -297,7 +315,7 @@ while true; do
             echo ""
             
             QUARANTINE_DIR="$SCAN_LOG_DIR/quarantine"
-            if [ -d "$QUARANTINE_DIR" ] && [ "$(ls -A $QUARANTINE_DIR 2>/dev/null)" ]; then
+            if [ -d "$QUARANTINE_DIR" ] && [ "$(ls -A "$QUARANTINE_DIR" 2>/dev/null)" ]; then
                 echo "Quarantined files:"
                 ls -lh "$QUARANTINE_DIR"
                 echo ""
@@ -334,7 +352,7 @@ while true; do
             read -p "Press Enter to continue..."
             ;;
         
-        12)
+        13)
             clear
             echo -e "${BLUE}╔════════════════════════════════════════════════════════╗${NC}"
             echo -e "${BLUE}║              Scan Statistics                           ║${NC}"
@@ -346,7 +364,7 @@ while true; do
                 echo "Total scans performed: $TOTAL_SCANS"
                 echo ""
                 
-                if [ $TOTAL_SCANS -gt 0 ]; then
+                if [ "$TOTAL_SCANS" -gt 0 ]; then
                     echo "Recent scans:"
                     ls -lht "$SCAN_LOG_DIR"/*.log 2>/dev/null | head -5
                     echo ""
@@ -385,7 +403,7 @@ while true; do
                 less "/home/$logfile"
             fi
             ;;
-        11)
+        12)
             clear
             echo "=== Mount Drive for Scanning ==="
             echo ""
@@ -395,11 +413,15 @@ while true; do
             read -p "Enter partition to mount (e.g., /dev/sda1): " part
             read -p "Mount point name (e.g., windows): " mountname
             
-            if [ -n "$part" ] && [ -n "$mountname" ]; then
+            if [ -n "$part" ] && [ -n "$mountname" ] && validate_partition "$part"; then
+                # Restrict mount point name to a safe single path component
+                if [[ ! "$mountname" =~ ^[A-Za-z0-9_-]+$ ]]; then
+                    echo "Error: Invalid mount point name (use letters, digits, - or _)"
+                    read -p "Press Enter to continue..."
+                    continue
+                fi
                 mkdir -p "/mnt/$mountname"
-                mount "$part" "/mnt/$mountname"
-                
-                if [ $? -eq 0 ]; then
+                if mount "$part" "/mnt/$mountname"; then
                     echo ""
                     echo "Successfully mounted $part to /mnt/$mountname"
                     echo ""

@@ -10,21 +10,47 @@ echo "=== NexUSB ISO Downloader ==="
 echo ""
 
 # Function to download ISO
+# Args: name, url, output, [checksum as "algo:hexdigest" e.g. "md5:abc..." or "sha256:..."]
 download_iso() {
     local name="$1"
     local url="$2"
     local output="$3"
-    
+    local checksum="$4"
+
     echo "Downloading: $name"
     echo "URL: $url"
-    
-    if wget --progress=bar:force -O "$output" "$url" 2>&1; then
-        echo "✓ $name downloaded successfully"
-        return 0
-    else
+
+    if ! wget --progress=bar:force -O "$output" "$url" 2>&1; then
         echo "✗ Failed to download $name"
         return 1
     fi
+
+    if [ -n "$checksum" ]; then
+        local algo="${checksum%%:*}"
+        local expected="${checksum#*:}"
+        local actual
+        case "$algo" in
+            md5)    actual=$(md5sum "$output" | awk '{print $1}') ;;
+            sha1)   actual=$(sha1sum "$output" | awk '{print $1}') ;;
+            sha256) actual=$(sha256sum "$output" | awk '{print $1}') ;;
+            *)      echo "⚠ Unknown checksum algorithm '$algo', skipping verification"; return 0 ;;
+        esac
+        if [ "$actual" = "$expected" ]; then
+            echo "✓ $name verified ($algo)"
+        else
+            echo "✗ CHECKSUM MISMATCH for $name"
+            echo "  expected: $expected"
+            echo "  actual:   $actual"
+            echo "  The file may be corrupted or tampered with. Removing."
+            rm -f "$output"
+            return 1
+        fi
+    else
+        echo "⚠ No checksum provided for $name; integrity not verified"
+    fi
+
+    echo "✓ $name downloaded successfully"
+    return 0
 }
 
 # Download freely available rescue ISOs automatically
@@ -77,9 +103,13 @@ download_iso "Puppy Linux" \
     "$ISO_DIR/Linux/puppy.iso"
 
 echo "[10/10] Tiny Core Linux..."
+# NOTE: tinycorelinux.net does not offer HTTPS (port 443 refuses connections),
+# so we cannot use TLS here. Upstream only publishes an MD5 checksum, served over
+# the same HTTP channel, so verify integrity with the pinned MD5 below.
 download_iso "Tiny Core Linux" \
     "http://tinycorelinux.net/15.x/x86_64/release/TinyCorePure64-15.0.iso" \
-    "$ISO_DIR/Linux/tinycore.iso"
+    "$ISO_DIR/Linux/tinycore.iso" \
+    "md5:11e9b4ce52825d9d221515e90e5ac1c3"
 
 # Extract zipped ISOs
 if [ -f "$ISO_DIR/Tools/memtest86plus.zip" ]; then
