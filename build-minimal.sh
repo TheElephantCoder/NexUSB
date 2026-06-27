@@ -29,10 +29,12 @@ echo "  Target Size: ~2GB ISO"
 echo "  Includes: Essential rescue tools only"
 echo "  Boot: UEFI + Legacy BIOS"
 echo ""
-read -p "Continue? (y/n) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
+if [ -z "${NEXUSB_ASSUME_YES:-}" ]; then
+    read -p "Continue? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
 fi
 
 echo -e "${BLUE}[1/7] Cleaning previous builds...${NC}"
@@ -57,7 +59,7 @@ echo -e "${BLUE}[3.5/7] Installing professional GUI...${NC}"
 ./scripts/install-gui.sh "$WORK_DIR"
 
 echo -e "${BLUE}[4/7] Configuring boot environment...${NC}"
-./scripts/setup-boot.sh "$ISO_DIR"
+./scripts/setup-boot.sh "$ISO_DIR" "$WORK_DIR"
 
 echo -e "${BLUE}[5/7] Applying theme...${NC}"
 ./scripts/apply-theme.sh "$ISO_DIR"

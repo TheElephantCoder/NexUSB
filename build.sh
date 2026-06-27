@@ -72,11 +72,13 @@ echo "  Log File: $LOG_FILE"
 echo "  Estimated Time: 60-90 minutes"
 echo "  Estimated Size: ~10GB"
 echo ""
-read -p "Continue? (y/n) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Build cancelled"
-    exit 0
+if [ -z "${NEXUSB_ASSUME_YES:-}" ]; then
+    read -p "Continue? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Build cancelled"
+        exit 0
+    fi
 fi
 
 # Start logging
@@ -111,39 +113,13 @@ echo -e "${BLUE}[5/10] Downloading essential ISOs...${NC}"
 ./scripts/download-isos.sh
 
 echo -e "${BLUE}[6/10] Configuring boot environment...${NC}"
-./scripts/setup-boot.sh "$ISO_DIR"
+./scripts/setup-boot.sh "$ISO_DIR" "$WORK_DIR"
 
 echo -e "${BLUE}[7/10] Applying theme...${NC}"
 ./scripts/apply-theme.sh "$ISO_DIR"
 
 echo -e "${BLUE}[8/10] Creating bootable ISO...${NC}"
 ./scripts/create-iso.sh "$ISO_DIR" "$DIST_DIR/$ISO_NAME"
-
-echo -e "${BLUE}[9/10] Creating multi-partition USB image...${NC}"
-./scripts/create-multiboot.sh "$DIST_DIR/$IMG_NAME" "$USB_SIZE"
-
-echo -e "${BLUE}[10/10] Generating checksums...${NC}"
-cd "$DIST_DIR"
-sha256sum "$ISO_NAME" > "$ISO_NAME.sha256"
-sha256sum "$IMG_NAME" > "$IMG_NAME.sha256"
-cd ..
-
-echo ""
-echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║          NexUSB Build Complete!                     ║${NC}"
-echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
-echo ""
-echo "Output files:"
-echo "  ISO (single boot): $DIST_DIR/$ISO_NAME"
-echo "  IMG (multi-partition): $DIST_DIR/$IMG_NAME"
-echo "  Checksums: $DIST_DIR/*.sha256"
-echo ""
-echo "Next steps:"
-echo "  1. Flash ISO to USB: sudo dd if=$DIST_DIR/$ISO_NAME of=/dev/sdX bs=4M"
-echo "  2. Or flash IMG: sudo dd if=$DIST_DIR/$IMG_NAME of=/dev/sdX bs=4M"
-echo "  3. Or use Ventoy/Rufus for easier installation"
-echo ""
-echo "For more information, see BUILD.md and docs/FLASHING.md"
 
 echo -e "${BLUE}[9/10] Creating multi-partition USB image...${NC}"
 log "Step 9: Creating USB image"

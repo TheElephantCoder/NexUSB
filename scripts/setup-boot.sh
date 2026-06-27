@@ -2,16 +2,17 @@
 # Setup GRUB boot environment
 
 ISO_DIR=$1
+WORK_DIR=${2:-build/work}
 
 echo "Creating ISO directory structure..."
 mkdir -p "$ISO_DIR"/{boot/grub,EFI/BOOT,live}
 
 echo "Copying kernel and initrd..."
-cp build/work/boot/vmlinuz-* "$ISO_DIR/live/vmlinuz"
-cp build/work/boot/initrd.img-* "$ISO_DIR/live/initrd"
+cp "$WORK_DIR"/boot/vmlinuz-* "$ISO_DIR/live/vmlinuz"
+cp "$WORK_DIR"/boot/initrd.img-* "$ISO_DIR/live/initrd"
 
 echo "Creating squashfs..."
-mksquashfs build/work "$ISO_DIR/live/filesystem.squashfs" \
+mksquashfs "$WORK_DIR" "$ISO_DIR/live/filesystem.squashfs" \
     -comp xz -e boot
 
 echo "Installing GRUB..."
