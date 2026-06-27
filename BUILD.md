@@ -113,6 +113,20 @@ so run it in an interactive terminal.
 - Not yet validated end-to-end in CI — the container scripts are syntax-checked
   but the full build run has not been executed in this environment.
 
+## Building on Windows 11 (ARM64 / x64)
+
+The build is Linux-only, so on Windows it runs inside **WSL2** (which provides a
+real Linux kernel; on Windows 11 ARM64 it is an arm64 kernel, so arm64 builds
+run natively). See [`windows/README.md`](windows/README.md). Quick start:
+
+```powershell
+# from the windows\ folder, in PowerShell
+.\Build-NexUSB.ps1                       # minimal, host arch
+.\Build-NexUSB.ps1 -Target full -Arch arm64
+```
+
+Output lands in `dist\`. Requires `wsl --install -d Ubuntu` (WSL2).
+
 ## Build Process (native Linux)
 
 ```bash

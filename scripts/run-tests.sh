@@ -55,6 +55,13 @@ done
 for script in autorun/*.sh; do
     run_test "$(basename "$script") syntax" bash -n "$script"
 done
+
+for dir in docker windows; do
+    for script in "$dir"/*.sh; do
+        [ -e "$script" ] || continue
+        run_test "$(basename "$script") syntax" bash -n "$script"
+    done
+done
 echo ""
 
 # Python syntax tests
