@@ -15,6 +15,9 @@ ISO_DIR="$BUILD_DIR/iso"
 USB_SIZE=${1:-32}  # Default 32GB, can specify different size
 LOG_FILE="build.log"
 
+# Resolve target architecture (NEXUSB_ARCH=amd64|arm64, default amd64)
+source "$(dirname "$0")/scripts/arch-config.sh"
+
 # Colors
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
@@ -66,6 +69,7 @@ fi
 # Display configuration
 echo -e "${YELLOW}Build Configuration:${NC}"
 echo "  Target USB Size: ${USB_SIZE}GB"
+echo "  Target architecture: $NEXUSB_ARCH"
 echo "  Build Directory: $BUILD_DIR"
 echo "  Output Directory: $DIST_DIR"
 echo "  Log File: $LOG_FILE"

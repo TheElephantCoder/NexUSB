@@ -15,6 +15,9 @@ NC='\033[0m'
 ERRORS=0
 WARNINGS=0
 
+# Resolve target architecture settings (NEXUSB_ARCH, default amd64)
+source "$(dirname "$0")/arch-config.sh"
+
 # Function to check command
 check_command() {
     local cmd=$1
@@ -55,16 +58,18 @@ fi
 echo ""
 
 # Check required commands
-echo "Checking required tools..."
+echo "Checking required tools (target arch: $NEXUSB_ARCH)..."
 check_command "debootstrap" "debootstrap"
-check_command "grub-mkstandalone" "grub-pc-bin grub-efi-amd64-bin"
+check_command "grub-mkstandalone" "grub2-common $GRUB_EFI_PKG"
 check_command "xorriso" "xorriso"
 check_command "mksquashfs" "squashfs-tools"
 check_command "mcopy" "mtools"
-check_command "isohybrid" "isolinux"
+if [ "$HAS_BIOS" -eq 1 ]; then
+    check_command "isohybrid" "syslinux-utils"
+fi
 check_command "parted" "parted"
 check_command "mkfs.ntfs" "ntfs-3g"
-check_command "mkfs.exfat" "exfat-utils"
+check_command "mkfs.exfat" "exfatprogs"
 check_command "convert" "imagemagick"
 check_command "wget" "wget"
 echo ""
@@ -116,13 +121,21 @@ else
 fi
 echo ""
 
-# Check architecture
+# Check architecture (host vs build target)
 echo "Checking system architecture..."
 ARCH=$(uname -m)
-if [ "$ARCH" = "x86_64" ]; then
-    echo -e "${GREEN}✓${NC} x86_64 architecture"
+case "$NEXUSB_ARCH" in
+    amd64) EXPECTED_HOST="x86_64" ;;
+    arm64) EXPECTED_HOST="aarch64" ;;
+esac
+if [ "$ARCH" = "$EXPECTED_HOST" ]; then
+    echo -e "${GREEN}✓${NC} host $ARCH matches target $NEXUSB_ARCH (native build)"
+elif [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "aarch64" ]; then
+    echo -e "${YELLOW}⚠${NC} host is $ARCH but target is $NEXUSB_ARCH — cross-build"
+    echo -e "    needs qemu-user-static + binfmt (or build in a native container)"
+    ((WARNINGS++))
 else
-    echo -e "${RED}✗${NC} Unsupported architecture: $ARCH (need x86_64)"
+    echo -e "${RED}✗${NC} Unsupported host architecture: $ARCH"
     ((ERRORS++))
 fi
 echo ""
@@ -158,8 +171,14 @@ else
     echo ""
     echo "Please install missing dependencies:"
     echo "  sudo apt update"
-    echo "  sudo apt install -y debootstrap grub-pc-bin grub-efi-amd64-bin \\"
-    echo "      xorriso squashfs-tools mtools isolinux syslinux-utils \\"
-    echo "      parted ntfs-3g exfat-utils imagemagick wget"
+    if [ "$HAS_BIOS" -eq 1 ]; then
+        echo "  sudo apt install -y debootstrap grub2-common grub-pc-bin \\"
+        echo "      grub-efi-amd64-bin xorriso squashfs-tools mtools \\"
+        echo "      syslinux-utils parted ntfs-3g exfatprogs imagemagick wget"
+    else
+        echo "  sudo apt install -y debootstrap grub2-common grub-efi-arm64-bin \\"
+        echo "      xorriso squashfs-tools mtools parted ntfs-3g exfatprogs \\"
+        echo "      imagemagick wget"
+    fi
     exit 1
 fi

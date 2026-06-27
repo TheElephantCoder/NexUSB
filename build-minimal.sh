@@ -12,6 +12,9 @@ ISO_NAME="NexUSB-Minimal.iso"
 WORK_DIR="$BUILD_DIR/work"
 ISO_DIR="$BUILD_DIR/iso"
 
+# Resolve target architecture (NEXUSB_ARCH=amd64|arm64, default amd64)
+source "$(dirname "$0")/scripts/arch-config.sh"
+
 # Colors
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
@@ -26,6 +29,7 @@ fi
 
 echo -e "${YELLOW}Minimal Build Configuration:${NC}"
 echo "  Target Size: ~2GB ISO"
+echo "  Target architecture: $NEXUSB_ARCH"
 echo "  Includes: Essential rescue tools only"
 echo "  Boot: UEFI + Legacy BIOS"
 echo ""

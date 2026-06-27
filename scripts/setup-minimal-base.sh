@@ -2,15 +2,16 @@
 # Setup minimal base system for smaller ISO
 
 WORK_DIR=$1
+source "$(dirname "$0")/arch-config.sh"
 
-echo "Downloading minimal base system..."
-debootstrap --variant=minbase --arch=amd64 jammy "$WORK_DIR" http://archive.ubuntu.com/ubuntu/
+echo "Downloading minimal base system (arch: $DEB_ARCH)..."
+debootstrap --variant=minbase --arch="$DEB_ARCH" jammy "$WORK_DIR" "$UBUNTU_MIRROR"
 
 echo "Configuring minimal system..."
 cat > "$WORK_DIR/etc/apt/sources.list" << EOF
-deb http://archive.ubuntu.com/ubuntu jammy main restricted universe
-deb http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe
-deb http://security.ubuntu.com/ubuntu jammy-security main restricted universe
+deb $UBUNTU_MIRROR jammy main restricted universe
+deb $UBUNTU_MIRROR jammy-updates main restricted universe
+deb $UBUNTU_SECURITY_MIRROR jammy-security main restricted universe
 EOF
 
 # Chroot and update
