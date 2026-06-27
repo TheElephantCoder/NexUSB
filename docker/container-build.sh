@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-#
-# Runs INSIDE the build container. Not meant to be run on the host directly.
-#
-# The repo is mounted read-only at /src. We copy it into a container-local
-# directory (/build) so that debootstrap can create device nodes and a real
-# Linux rootfs without fighting the host bind-mount filesystem (VirtioFS on
-# Docker Desktop cannot host mknod / certain ownerships). Final artifacts are
-# copied out to /out, which is bind-mounted back to <repo>/dist on the host.
+# Runs inside the build container (not on the host).
+# /src is the repo, mounted read-only. We copy it to /build first because
+# debootstrap can't mknod / set ownership on the Docker bind mount. Finished
+# artifacts go to /out, which maps back to <repo>/dist.
 set -euo pipefail
 
 TARGET="${1:-minimal}"

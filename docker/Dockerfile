@@ -1,14 +1,8 @@
 # syntax=docker/dockerfile:1
-#
-# NexUSB build environment (multi-arch).
-#
-# The build executes target-arch binaries inside a chroot (debootstrap + apt),
-# so the container platform must match the target architecture. The caller sets
-# it via `docker build --platform linux/<arch>`; BuildKit then provides
-# TARGETARCH (amd64 | arm64), which selects the right GRUB packages below.
-#
-# On Apple Silicon, `--platform linux/arm64` runs natively; `linux/amd64` runs
-# under emulation. Base is ubuntu:22.04 (jammy) to match the debootstrap suite.
+# Multi-arch NexUSB build env. The container platform has to match the target
+# arch (debootstrap/apt run target-arch binaries), so --platform sets
+# TARGETARCH, which picks the GRUB packages below. ubuntu:22.04 = the suite
+# debootstrap pulls.
 FROM ubuntu:22.04
 
 ARG TARGETARCH

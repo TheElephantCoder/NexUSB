@@ -1,19 +1,7 @@
 #!/bin/bash
-# Resolve per-architecture build settings from NEXUSB_ARCH.
-#
-# Source this from build scripts (it exports the vars below). Honors
-# NEXUSB_ARCH = amd64 | arm64 (default amd64). x86_64/aarch64 are accepted as
-# aliases.
-#
-# Exported:
-#   NEXUSB_ARCH            normalized: amd64 | arm64
-#   DEB_ARCH               debootstrap --arch value
-#   UBUNTU_MIRROR          apt mirror (archive vs ports)
-#   UBUNTU_SECURITY_MIRROR security mirror
-#   GRUB_EFI_FORMAT        grub-mkstandalone --format (x86_64-efi | arm64-efi)
-#   GRUB_EFI_PKG           grub EFI package name for the host build env
-#   EFI_BOOT_NAME          removable-media EFI binary (BOOTX64.EFI | BOOTAA64.EFI)
-#   HAS_BIOS               1 if Legacy BIOS boot applies (amd64 only), else 0
+# Per-arch build settings. Source this; it reads NEXUSB_ARCH (amd64|arm64,
+# default amd64; x86_64/aarch64 also accepted) and exports DEB_ARCH, the apt
+# mirrors, the GRUB EFI format/package, the removable EFI name, and HAS_BIOS.
 
 NEXUSB_ARCH="${NEXUSB_ARCH:-amd64}"
 
