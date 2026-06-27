@@ -8,7 +8,9 @@ source "$(dirname "$0")/arch-config.sh"
 echo "Creating ISO image (arch: $NEXUSB_ARCH)..."
 
 if [ "$HAS_BIOS" -eq 1 ]; then
-    # amd64: hybrid bios (el torito + isohybrid mbr) + uefi
+    # amd64: hybrid bios (el torito + isohybrid mbr) + uefi.
+    # passing $ISO_DIR as the single source tree puts its contents at the ISO
+    # root, so the -eltorito-boot/-e paths resolve relative to that root.
     xorriso -as mkisofs \
         -iso-level 3 \
         -full-iso9660-filenames \
@@ -25,10 +27,7 @@ if [ "$HAS_BIOS" -eq 1 ]; then
         -no-emul-boot \
         -append_partition 2 0xef "$ISO_DIR/EFI/BOOT/$EFI_BOOT_NAME" \
         -output "$OUTPUT_ISO" \
-        -graft-points \
-        "$ISO_DIR" \
-        /boot/grub/bios.img=boot/grub/bios.img \
-        "/EFI/BOOT/$EFI_BOOT_NAME=EFI/BOOT/$EFI_BOOT_NAME"
+        "$ISO_DIR"
 else
     # arm64: uefi-only, no bios el torito
     xorriso -as mkisofs \
@@ -39,9 +38,7 @@ else
         -no-emul-boot \
         -append_partition 2 0xef "$ISO_DIR/EFI/BOOT/$EFI_BOOT_NAME" \
         -output "$OUTPUT_ISO" \
-        -graft-points \
-        "$ISO_DIR" \
-        "/EFI/BOOT/$EFI_BOOT_NAME=EFI/BOOT/$EFI_BOOT_NAME"
+        "$ISO_DIR"
 fi
 
 chmod 644 "$OUTPUT_ISO"

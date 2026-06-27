@@ -26,9 +26,14 @@ grub-mkstandalone \
 
 if [ "$HAS_BIOS" -eq 1 ]; then
     echo "Installing GRUB (Legacy BIOS: i386-pc)..."
+    # i386-pc core.img must fit the El Torito embed limit (~0x78000). By
+    # default grub-mkstandalone packs *every* module into the memdisk, which
+    # overflows it; restrict to the set actually needed to boot the ISO.
     grub-mkstandalone \
         --format=i386-pc \
         --output="$ISO_DIR/boot/grub/core.img" \
+        --install-modules="linux linux16 normal configfile iso9660 biosdisk search search_label search_fs_uuid search_fs_file loopback part_gpt part_msdos fat ext2 gzio xzio gfxterm gfxmenu gfxterm_background all_video video font png jpeg chain halt reboot boot multiboot test true echo sleep ls cat help memdisk tar" \
+        --modules="linux normal iso9660 biosdisk search configfile" \
         --locales="" \
         --fonts="" \
         "boot/grub/grub.cfg=theme/grub.cfg"
