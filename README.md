@@ -23,9 +23,22 @@ the container and WSL2 helpers described below.
 - **Password reset** — chntpw for Windows accounts, Linux password reset.
 - A GTK GUI that starts automatically, plus text menus per category.
 
-There are two builds: a **minimal** ISO (~2 GB, the essentials) and a **full**
-image (~32 GB) that adds the rest of the Linux tools, Windows portable apps, and
-a multiboot ISO collection.
+There are two builds: a **minimal** ISO (the essentials) and a **full** image
+that adds the rest of the Linux tools, Windows portable apps, and a multiboot
+ISO collection.
+
+|                       | Minimal                          | Full                                         |
+|-----------------------|----------------------------------|----------------------------------------------|
+| Output                | `NexUSB-Minimal.iso`             | `NexUSB.iso` + `NexUSB.img`                  |
+| Approx. size          | ~2 GB                            | ~32 GB (configurable)                        |
+| Build time            | ~30 min                          | ~60–90 min                                   |
+| Linux tools           | essentials (ClamAV, TestDisk/PhotoRec, GParted, nmap, remote access) | full set from `config/tools.conf` |
+| Windows portable apps | —                                | yes (`config/windows-tools.conf`)            |
+| Bootable ISO library  | —                                | yes (`config/iso-collection.conf`)           |
+| Layout                | single ISO                       | multi-partition (boot / live / Windows / ISOs) |
+| GUI                   | yes                              | yes                                          |
+
+Build commands for each are below.
 
 ## Building
 
