@@ -4,9 +4,9 @@
 set -e
 set -o pipefail
 
-# config
-BUILD_DIR="build"
-DIST_DIR="dist"
+# config — build/output dirs can point at another disk via env
+BUILD_DIR="${NEXUSB_BUILD_DIR:-build}"
+DIST_DIR="${NEXUSB_DIST_DIR:-dist}"
 ISO_NAME="NexUSB.iso"
 IMG_NAME="NexUSB.img"
 WORK_DIR="$BUILD_DIR/work"
@@ -34,6 +34,17 @@ error_exit() {
     echo -e "${RED}Error: $1${NC}" >&2
     log "ERROR: $1"
     exit 1
+}
+
+# refuse to rm -rf a dangerous path (these dirs get wiped each run)
+guard_dir() {
+    case "$1" in
+        ""|"/"|"."|"..") error_exit "Refusing to use '$1' as a build/output dir" ;;
+    esac
+    [ "$1" = "$HOME" ] && error_exit "Refusing build/output dir = \$HOME"
+    if command -v mountpoint >/dev/null 2>&1 && mountpoint -q "$1" 2>/dev/null; then
+        error_exit "'$1' is a mount root — point NEXUSB_BUILD_DIR/NEXUSB_DIST_DIR at a subdirectory on that disk"
+    fi
 }
 
 # note failure on exit
@@ -88,6 +99,8 @@ log "=== NexUSB Build Started ==="
 log "Configuration: ${USB_SIZE}GB target size"
 
 echo -e "${BLUE}[1/10] Cleaning previous builds...${NC}"
+guard_dir "$BUILD_DIR"
+guard_dir "$DIST_DIR"
 rm -rf "$BUILD_DIR" "$DIST_DIR"
 mkdir -p "$WORK_DIR" "$ISO_DIR" "$DIST_DIR"
 
@@ -129,10 +142,8 @@ log "Step 9: Creating USB image"
 
 echo -e "${BLUE}[10/10] Generating checksums...${NC}"
 log "Step 10: Generating checksums"
-cd "$DIST_DIR"
-sha256sum "$ISO_NAME" > "$ISO_NAME.sha256"
-sha256sum "$IMG_NAME" > "$IMG_NAME.sha256"
-cd ..
+( cd "$DIST_DIR" && sha256sum "$ISO_NAME" > "$ISO_NAME.sha256" )
+( cd "$DIST_DIR" && sha256sum "$IMG_NAME" > "$IMG_NAME.sha256" )
 
 # output sizes
 ISO_SIZE=$(du -h "$DIST_DIR/$ISO_NAME" 2>/dev/null | cut -f1 || echo "N/A")

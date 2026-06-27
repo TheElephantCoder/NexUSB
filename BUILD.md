@@ -59,6 +59,28 @@ Differences handled automatically (see `scripts/arch-config.sh`):
   container below — is simplest.
 
 
+## Low on disk space? Build on another drive
+
+The build's intermediate files (the debootstrap rootfs, squashfs) and the final
+ISO/IMG can be large. Point them at another disk with two env vars:
+
+```bash
+sudo NEXUSB_BUILD_DIR=/mnt/ext/nexusb-build \
+     NEXUSB_DIST_DIR=/mnt/ext/nexusb-dist \
+     ./build.sh
+```
+
+- `NEXUSB_BUILD_DIR` — scratch/work directory (wiped on each run).
+- `NEXUSB_DIST_DIR` — where the finished ISO/IMG and checksums land.
+
+Point them at a dedicated subdirectory on the other disk, not a volume root —
+the build refuses obviously-dangerous targets (`/`, `$HOME`, a mount root) since
+the build dir is `rm -rf`'d each run.
+
+For the container build, `NEXUSB_DIST_DIR` (or the Flasher app's "Output folder")
+relocates the **output**; the container's intermediate files still use Docker's
+own disk.
+
 ## Building on macOS / Apple Silicon
 
 macOS cannot run the build natively (no `debootstrap`/`chroot` for Linux

@@ -5,15 +5,26 @@ echo "=== NexUSB Minimal ISO Builder ==="
 echo "Building lightweight bootable ISO for quick deployment"
 echo ""
 
-# config
-BUILD_DIR="build-minimal"
-DIST_DIR="dist"
+# config — build/output dirs can point at another disk via env
+BUILD_DIR="${NEXUSB_BUILD_DIR:-build-minimal}"
+DIST_DIR="${NEXUSB_DIST_DIR:-dist}"
 ISO_NAME="NexUSB-Minimal.iso"
 WORK_DIR="$BUILD_DIR/work"
 ISO_DIR="$BUILD_DIR/iso"
 
 # arch settings (NEXUSB_ARCH, default amd64)
 source "$(dirname "$0")/scripts/arch-config.sh"
+
+# refuse to rm -rf a dangerous path (build dir is wiped each run)
+guard_dir() {
+    case "$1" in
+        ""|"/"|"."|"..") echo "Refusing to use '$1' as a build/output dir"; exit 1 ;;
+    esac
+    [ "$1" = "$HOME" ] && { echo "Refusing build/output dir = \$HOME"; exit 1; }
+    if command -v mountpoint >/dev/null 2>&1 && mountpoint -q "$1" 2>/dev/null; then
+        echo "'$1' is a mount root — point NEXUSB_BUILD_DIR/NEXUSB_DIST_DIR at a subdirectory"; exit 1
+    fi
+}
 
 # colors
 BLUE='\033[0;34m'
@@ -42,6 +53,8 @@ if [ -z "${NEXUSB_ASSUME_YES:-}" ]; then
 fi
 
 echo -e "${BLUE}[1/7] Cleaning previous builds...${NC}"
+guard_dir "$BUILD_DIR"
+guard_dir "$DIST_DIR"
 rm -rf "$BUILD_DIR"
 mkdir -p "$WORK_DIR" "$ISO_DIR" "$DIST_DIR"
 
@@ -72,9 +85,7 @@ echo -e "${BLUE}[6/7] Creating minimal ISO...${NC}"
 ./scripts/create-iso.sh "$ISO_DIR" "$DIST_DIR/$ISO_NAME"
 
 echo -e "${BLUE}[7/7] Generating checksum...${NC}"
-cd "$DIST_DIR"
-sha256sum "$ISO_NAME" > "$ISO_NAME.sha256"
-cd ..
+( cd "$DIST_DIR" && sha256sum "$ISO_NAME" > "$ISO_NAME.sha256" )
 
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"

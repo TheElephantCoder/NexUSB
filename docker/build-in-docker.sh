@@ -26,6 +26,9 @@ if [[ "$ARCH" != "amd64" && "$ARCH" != "arm64" ]]; then
 fi
 [ -n "$USB_SIZE" ] || USB_SIZE=32
 
+# output dir; can point at another disk via NEXUSB_DIST_DIR
+OUT_DIR="${NEXUSB_DIST_DIR:-$REPO_ROOT/dist}"
+
 IMAGE="nexusb-build:$ARCH"
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -41,7 +44,7 @@ fi
 echo ">> [1/2] Building $ARCH build-environment image ($IMAGE) ..."
 docker build --platform "linux/$ARCH" --build-arg TARGETARCH="$ARCH" -t "$IMAGE" "$SCRIPT_DIR"
 
-mkdir -p "$REPO_ROOT/dist"
+mkdir -p "$OUT_DIR"
 
 echo ">> [2/2] Running '$TARGET' build (linux/$ARCH) ..."
 if [ -n "${NEXUSB_ASSUME_YES:-}" ]; then
@@ -52,7 +55,7 @@ if [ -n "${NEXUSB_ASSUME_YES:-}" ]; then
         -e NEXUSB_ASSUME_YES=1 \
         -e NEXUSB_ARCH="$ARCH" \
         -v "$REPO_ROOT":/src:ro \
-        -v "$REPO_ROOT/dist":/out \
+        -v "$OUT_DIR":/out \
         "$IMAGE" \
         container-build.sh "$TARGET" "$USB_SIZE"
 else
@@ -61,10 +64,10 @@ else
         --privileged \
         -e NEXUSB_ARCH="$ARCH" \
         -v "$REPO_ROOT":/src:ro \
-        -v "$REPO_ROOT/dist":/out \
+        -v "$OUT_DIR":/out \
         "$IMAGE" \
         container-build.sh "$TARGET" "$USB_SIZE"
 fi
 
 echo ""
-echo ">> Done. Artifacts are in: $REPO_ROOT/dist/"
+echo ">> Done. Artifacts are in: $OUT_DIR/"
