@@ -131,22 +131,27 @@ echo "  Creating NexUSB Branding"
 echo "=========================================="
 echo ""
 
-# Main logo (400x80)
-echo "Creating NexUSB logo..."
-convert -size 400x80 xc:none \
-    -font "DejaVu-Sans-Bold" -pointsize 48 \
-    -fill "#66b3ff" -annotate +10+60 "Nexus" \
-    -fill "#0066cc" -annotate +200+60 "USB" \
-    "$ICON_DIR/nexus-logo.png"
+# Brand logo + app icon (from the bundled NexUSB-Logo.png)
+SOURCE_LOGO="$ICON_DIR/NexUSB-Logo.png"
 
-# App icon (256x256)
-echo "Creating app icon..."
-convert -size 256x256 xc:none \
-    -fill "#001a33" -draw "roundrectangle 20,20 236,236 20,20" \
-    -fill "#0066cc" -draw "roundrectangle 25,25 231,231 18,18" \
-    -fill "#66b3ff" -font "DejaVu-Sans-Bold" -pointsize 120 \
-    -gravity center -annotate +0+0 "N" \
-    "$ICON_DIR/nexus-icon.png"
+if [ -f "$SOURCE_LOGO" ]; then
+    echo "Using bundled NexUSB logo for branding..."
+    convert "$SOURCE_LOGO" -resize 256x256 "$ICON_DIR/nex-logo.png"
+    convert "$SOURCE_LOGO" -resize 256x256 "$ICON_DIR/nex-icon.png"
+else
+    echo "Warning: $SOURCE_LOGO not found; generating a text fallback logo"
+    convert -size 400x80 xc:none \
+        -font "DejaVu-Sans-Bold" -pointsize 48 \
+        -fill "#66b3ff" -annotate +10+60 "Nex" \
+        -fill "#0066cc" -annotate +140+60 "USB" \
+        "$ICON_DIR/nex-logo.png"
+    convert -size 256x256 xc:none \
+        -fill "#001a33" -draw "roundrectangle 20,20 236,236 20,20" \
+        -fill "#0066cc" -draw "roundrectangle 25,25 231,231 18,18" \
+        -fill "#66b3ff" -font "DejaVu-Sans-Bold" -pointsize 120 \
+        -gravity center -annotate +0+0 "N" \
+        "$ICON_DIR/nex-icon.png"
+fi
 
 # Background (1920x1080)
 echo "Creating background..."

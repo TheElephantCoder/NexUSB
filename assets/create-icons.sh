@@ -5,26 +5,29 @@ ICON_DIR="assets/icons"
 TOOLS_DIR="$ICON_DIR/tools"
 mkdir -p "$ICON_DIR" "$TOOLS_DIR"
 
-echo "Creating NexUSB branding and downloading tool logos..."
+echo "Creating NexUSB branding from the bundled logo..."
 
-# Main logo (400x80)
-convert -size 400x80 xc:transparent \
-    -font "DejaVu-Sans-Bold" -pointsize 48 \
-    -fill "#66b3ff" -annotate +10+60 "Nex" \
-    -fill "#0066cc" -annotate +200+60 "USB" \
-    -stroke "#0066cc" -strokewidth 2 \
-    -draw "circle 180,40 180,10" \
-    "$ICON_DIR/nex-logo.png"
+SOURCE_LOGO="$ICON_DIR/NexUSB-Logo.png"
 
-# App icon (256x256)
-convert -size 256x256 xc:transparent \
-    -fill "linear-gradient(#001a33-#0066cc)" \
-    -draw "roundrectangle 20,20 236,236 20,20" \
-    -fill "#66b3ff" -font "DejaVu-Sans-Bold" -pointsize 80 \
-    -annotate +60+150 "N" \
-    -stroke "#ffffff" -strokewidth 3 \
-    -draw "circle 128,128 128,80" \
-    "$ICON_DIR/nex-icon.png"
+if [ -f "$SOURCE_LOGO" ]; then
+    # Derive the header logo and app icon from the real NexUSB logo.
+    convert "$SOURCE_LOGO" -resize 256x256 "$ICON_DIR/nex-logo.png"
+    convert "$SOURCE_LOGO" -resize 256x256 "$ICON_DIR/nex-icon.png"
+else
+    echo "Warning: $SOURCE_LOGO not found; generating a text fallback"
+    # Fallback wordmark
+    convert -size 400x80 xc:transparent \
+        -font "DejaVu-Sans-Bold" -pointsize 48 \
+        -fill "#66b3ff" -annotate +10+60 "Nex" \
+        -fill "#0066cc" -annotate +200+60 "USB" \
+        "$ICON_DIR/nex-logo.png"
+    # Fallback app icon
+    convert -size 256x256 xc:transparent \
+        -fill "#001a33" -draw "roundrectangle 20,20 236,236 20,20" \
+        -fill "#66b3ff" -font "DejaVu-Sans-Bold" -pointsize 120 \
+        -gravity center -annotate +0+0 "N" \
+        "$ICON_DIR/nex-icon.png"
+fi
 
 # Background (1920x1080)
 convert -size 1920x1080 \
