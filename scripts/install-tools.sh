@@ -4,6 +4,24 @@
 WORK_DIR=$1
 TOOLS_CONF="config/tools.conf"
 
+# mount kernel virtual filesystems into the chroot so package postinst
+# scripts behave (apt wants /dev/pts; some postinst probe /proc). unmounted
+# on exit via trap so they are never captured by the later squashfs.
+mount_chroot() {
+    mount -t proc   proc   "$WORK_DIR/proc"    2>/dev/null || true
+    mount -t sysfs  sys    "$WORK_DIR/sys"     2>/dev/null || true
+    mount --bind    /dev   "$WORK_DIR/dev"     2>/dev/null || true
+    mount -t devpts devpts "$WORK_DIR/dev/pts" 2>/dev/null || true
+}
+umount_chroot() {
+    umount -l "$WORK_DIR/dev/pts" 2>/dev/null || true
+    umount -l "$WORK_DIR/dev"     2>/dev/null || true
+    umount -l "$WORK_DIR/sys"     2>/dev/null || true
+    umount -l "$WORK_DIR/proc"    2>/dev/null || true
+}
+trap umount_chroot EXIT
+mount_chroot
+
 echo "Installing essential packages..."
 chroot "$WORK_DIR" apt install -y \
     linux-generic \

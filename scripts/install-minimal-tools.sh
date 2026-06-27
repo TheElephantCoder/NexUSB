@@ -3,6 +3,24 @@
 
 WORK_DIR=$1
 
+# mount kernel virtual filesystems into the chroot so package postinst
+# scripts behave (anydesk probes /proc/1/exe; apt wants /dev/pts). unmounted
+# on exit via trap so they are never captured by the later squashfs.
+mount_chroot() {
+    mount -t proc   proc   "$WORK_DIR/proc"    2>/dev/null || true
+    mount -t sysfs  sys    "$WORK_DIR/sys"     2>/dev/null || true
+    mount --bind    /dev   "$WORK_DIR/dev"     2>/dev/null || true
+    mount -t devpts devpts "$WORK_DIR/dev/pts" 2>/dev/null || true
+}
+umount_chroot() {
+    umount -l "$WORK_DIR/dev/pts" 2>/dev/null || true
+    umount -l "$WORK_DIR/dev"     2>/dev/null || true
+    umount -l "$WORK_DIR/sys"     2>/dev/null || true
+    umount -l "$WORK_DIR/proc"    2>/dev/null || true
+}
+trap umount_chroot EXIT
+mount_chroot
+
 echo "Installing essential packages..."
 
 # core
@@ -80,16 +98,25 @@ wget -O "$WORK_DIR/opt/remote-tools/teamviewer.deb" \
 wget -O "$WORK_DIR/opt/remote-tools/anydesk.deb" \
     "https://download.anydesk.com/linux/anydesk_6.3.2-1_amd64.deb" || true
 
-# install if download worked
-if [ -f "$WORK_DIR/opt/remote-tools/teamviewer.deb" ]; then
-    chroot "$WORK_DIR" dpkg -i /opt/remote-tools/teamviewer.deb || true
-    chroot "$WORK_DIR" apt install -f -y
-fi
+# install via apt so dependencies resolve in one step. if a package still
+# fails to configure (e.g. virtual filesystems unavailable), purge it so the
+# dpkg db stays clean and squashfs never captures a half-configured package;
+# the .deb is left under /opt/remote-tools for manual install at first boot.
+for tool in teamviewer anydesk; do
+    deb="/opt/remote-tools/$tool.deb"
+    if [ -s "$WORK_DIR$deb" ]; then
+        echo "Installing $tool..."
+        if ! chroot "$WORK_DIR" apt install -y --no-install-recommends "$deb"; then
+            echo "Warning: $tool did not configure; keeping the .deb in /opt/remote-tools for manual install"
+            chroot "$WORK_DIR" apt-get purge -y "$tool" 2>/dev/null || true
+            chroot "$WORK_DIR" dpkg --purge --force-remove-reinstreq "$tool" 2>/dev/null || true
+        fi
+    fi
+done
 
-if [ -f "$WORK_DIR/opt/remote-tools/anydesk.deb" ]; then
-    chroot "$WORK_DIR" dpkg -i /opt/remote-tools/anydesk.deb || true
-    chroot "$WORK_DIR" apt install -f -y
-fi
+# make sure nothing is left half-configured before the squashfs is built
+chroot "$WORK_DIR" dpkg --configure -a 2>/dev/null || true
+chroot "$WORK_DIR" apt-get install -f -y 2>/dev/null || true
 
 # trim size
 echo "Cleaning up to reduce ISO size..."
