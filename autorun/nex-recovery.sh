@@ -1,5 +1,5 @@
 #!/bin/bash
-# System Recovery Menu
+# recovery tools
 
 validate_partition() {
     local part="$1"

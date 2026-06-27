@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup GRUB boot environment
+# grub boot env
 
 ISO_DIR=$1
 WORK_DIR=${2:-build/work}

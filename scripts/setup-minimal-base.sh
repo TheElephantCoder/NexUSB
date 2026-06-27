@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup minimal base system for smaller ISO
+# minbase debootstrap, smaller iso
 
 WORK_DIR=$1
 source "$(dirname "$0")/arch-config.sh"
@@ -14,11 +14,11 @@ deb $UBUNTU_MIRROR jammy-updates main restricted universe
 deb $UBUNTU_SECURITY_MIRROR jammy-security main restricted universe
 EOF
 
-# Chroot and update
+# update in chroot
 chroot "$WORK_DIR" apt update
 chroot "$WORK_DIR" apt upgrade -y
 
-# Install only essential packages
+# just the essentials
 chroot "$WORK_DIR" apt install -y --no-install-recommends \
     linux-image-generic \
     live-boot \

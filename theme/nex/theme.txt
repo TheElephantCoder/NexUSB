@@ -1,13 +1,12 @@
-# NexUSB GRUB Theme
-# Modern blue and black design
+# grub theme, blue/black
 
-# General settings
+# general
 title-text: ""
 desktop-image: "background.png"
 desktop-color: "#000000"
 terminal-font: "Unifont Regular 16"
 
-# Boot menu
+# boot menu
 + boot_menu {
     left = 15%
     top = 25%
@@ -22,7 +21,7 @@ terminal-font: "Unifont Regular 16"
     selected_item_pixmap_style = "select_*.png"
 }
 
-# Title banner
+# title banner
 + image {
     left = 50%-200
     top = 10%
@@ -31,7 +30,7 @@ terminal-font: "Unifont Regular 16"
     file = "logo.png"
 }
 
-# Progress bar
+# progress bar
 + progress_bar {
     id = "__timeout__"
     left = 25%
@@ -46,7 +45,7 @@ terminal-font: "Unifont Regular 16"
     font = "Unifont Regular 14"
 }
 
-# Labels
+# labels
 + label {
     left = 0
     top = 95%

@@ -1,8 +1,7 @@
 #!/bin/bash
-# Remote Access Tools Menu
+# remote access tools
 
-# --- Validation helpers ----------------------------------------------------
-# Validate an IPv4 address, optionally with CIDR suffix.
+# ipv4, optionally with /cidr
 validate_ip_or_cidr() {
     local target="$1"
     if [[ ! "$target" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
@@ -17,21 +16,21 @@ validate_ip_or_cidr() {
     return 0
 }
 
-# Validate a hostname or IPv4 address (no shell metacharacters allowed).
+# hostname or ipv4, no shell metachars
 validate_host() {
     local host="$1"
     [[ "$host" =~ ^[A-Za-z0-9._-]+$ ]] || return 1
     return 0
 }
 
-# Validate user@hostname for SSH, rejecting leading dashes (option injection).
+# user@host, reject leading dash so it can't be read as an ssh option
 validate_ssh_target() {
     local target="$1"
     [[ "$target" =~ ^[A-Za-z0-9._-]+@[A-Za-z0-9._-]+$ ]] || return 1
     return 0
 }
 
-# Launch a GUI tool only if it is installed.
+# only launch if the binary's there
 launch_tool() {
     local name="$1"
     local cmd="$2"

@@ -5,23 +5,23 @@ echo "=== NexUSB Minimal ISO Builder ==="
 echo "Building lightweight bootable ISO for quick deployment"
 echo ""
 
-# Configuration
+# config
 BUILD_DIR="build-minimal"
 DIST_DIR="dist"
 ISO_NAME="NexUSB-Minimal.iso"
 WORK_DIR="$BUILD_DIR/work"
 ISO_DIR="$BUILD_DIR/iso"
 
-# Resolve target architecture (NEXUSB_ARCH=amd64|arm64, default amd64)
+# arch settings (NEXUSB_ARCH, default amd64)
 source "$(dirname "$0")/scripts/arch-config.sh"
 
-# Colors
+# colors
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# Check if running as root
+# need root
 if [ "$EUID" -ne 0 ]; then 
     echo -e "${YELLOW}Please run as root (sudo ./build-minimal.sh)${NC}"
     exit 1

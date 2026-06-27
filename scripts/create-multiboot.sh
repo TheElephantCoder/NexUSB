@@ -1,5 +1,5 @@
 #!/bin/bash
-# Create multi-partition USB layout for maximum compatibility
+# multi-partition usb image
 
 OUTPUT_IMG=$1
 SIZE_GB=${2:-32}
@@ -7,37 +7,37 @@ SIZE_GB=${2:-32}
 echo "Creating multi-partition USB image..."
 echo "Size: ${SIZE_GB}GB"
 
-# Calculate partition sizes
+# partition sizes
 BOOT_SIZE=512M
 NEX_SIZE=8G
 WINDOWS_SIZE=8G
 ISO_SIZE=$((SIZE_GB - 16))G
 DATA_SIZE=remaining
 
-# Create disk image
+# blank image
 dd if=/dev/zero of="$OUTPUT_IMG" bs=1M count=$((SIZE_GB * 1024)) status=progress
 
-# Create partition table
+# gpt
 parted "$OUTPUT_IMG" mklabel gpt
 
-# Partition 1: EFI Boot (FAT32)
+# p1: efi boot (fat32)
 parted "$OUTPUT_IMG" mkpart primary fat32 1MiB 513MiB
 parted "$OUTPUT_IMG" set 1 boot on
 parted "$OUTPUT_IMG" set 1 esp on
 
-# Partition 2: NexUSB Live System (ext4)
+# p2: live system (ext4)
 parted "$OUTPUT_IMG" mkpart primary ext4 513MiB 8705MiB
 
-# Partition 3: Windows Tools (NTFS)
+# p3: windows tools (ntfs)
 parted "$OUTPUT_IMG" mkpart primary ntfs 8705MiB 16897MiB
 
-# Partition 4: ISO Collection (exFAT for compatibility)
+# p4: iso collection
 parted "$OUTPUT_IMG" mkpart primary fat32 16897MiB 100%
 
 echo "Partition layout created"
 parted "$OUTPUT_IMG" print
 
-# Setup loop device
+# loop device
 LOOP_DEV=$(losetup -f --show "$OUTPUT_IMG")
 if [ -z "$LOOP_DEV" ]; then
     echo "Error: Failed to create loop device"
@@ -47,7 +47,7 @@ echo "Created loop device: $LOOP_DEV"
 
 partprobe "$LOOP_DEV"
 
-# Wait for the kernel to create the partition device nodes before formatting
+# wait for partition nodes before formatting
 echo "Waiting for partition devices..."
 for i in 1 2 3 4; do
     part="${LOOP_DEV}p${i}"
@@ -63,29 +63,29 @@ for i in 1 2 3 4; do
     fi
 done
 
-# Format partitions
+# format
 echo "Formatting partitions..."
 mkfs.vfat -F32 -n "NEXBOOT" "${LOOP_DEV}p1"
 mkfs.ext4 -L "NEXLIVE" "${LOOP_DEV}p2"
 mkfs.ntfs -f -L "WINTOOLS" "${LOOP_DEV}p3"
 mkfs.exfat -n "ISOS" "${LOOP_DEV}p4"
 
-# Mount and populate
+# mount + populate
 mkdir -p /mnt/{boot,live,windows,isos}
 mount "${LOOP_DEV}p1" /mnt/boot
 mount "${LOOP_DEV}p2" /mnt/live
 mount "${LOOP_DEV}p3" /mnt/windows
 mount "${LOOP_DEV}p4" /mnt/isos
 
-# Copy NexUSB system
+# copy live system
 echo "Copying NexUSB system..."
 cp -r build/iso/* /mnt/live/
 
-# Copy Windows tools
+# copy windows tools
 echo "Copying Windows tools..."
 cp -r build/windows-tools/* /mnt/windows/
 
-# Setup Ventoy on ISO partition
+# ventoy for multiboot
 echo "Installing Ventoy for multiboot..."
 cd /mnt/isos
 mkdir -p ventoy
@@ -122,7 +122,7 @@ EOF
 
 mkdir -p ISOs/{Linux,Security,Rescue,Antivirus,Windows,Tools}
 
-# Create README
+# readme
 cat > README.txt << 'EOF'
 NexUSB - ISO Collection
 
@@ -137,7 +137,7 @@ Place your ISO files in the appropriate subdirectories:
 The system will automatically detect and boot from any ISO placed here.
 EOF
 
-# Cleanup
+# cleanup
 cd /
 umount /mnt/{boot,live,windows,isos}
 losetup -d "$LOOP_DEV"

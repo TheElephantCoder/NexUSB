@@ -1,18 +1,18 @@
 #!/bin/bash
-# Install professional GUI components
+# gui components
 
 WORK_DIR=$1
 
 echo "Installing GUI components..."
 
-# Install Python GTK for GUI
+# python gtk
 chroot "$WORK_DIR" apt install -y \
     python3-gi \
     python3-gi-cairo \
     gir1.2-gtk-3.0 \
     gir1.2-gdkpixbuf-2.0
 
-# Install icon theme and fonts
+# icons + fonts
 chroot "$WORK_DIR" apt install -y \
     papirus-icon-theme \
     fonts-dejavu \
@@ -20,10 +20,10 @@ chroot "$WORK_DIR" apt install -y \
     imagemagick \
     wget
 
-# Create icons directory
+# icons dir
 mkdir -p "$WORK_DIR/usr/share/NexUSB/icons/tools"
 
-# Run icon creation script
+# fetch/build tool logos
 echo "Downloading and creating tool logos..."
 if [ -f "assets/download-logos.sh" ]; then
     chmod +x assets/download-logos.sh
@@ -32,19 +32,19 @@ else
     echo "Warning: Logo download script not found, using fallbacks"
 fi
 
-# Copy GUI application
+# copy gui app
 mkdir -p "$WORK_DIR/usr/share/NexUSB"
 cp -r gui/* "$WORK_DIR/usr/share/NexUSB/"
 chmod +x "$WORK_DIR/usr/share/NexUSB/nex-gui.py"
 
-# Copy icons
+# copy icons
 if [ -d "assets/icons" ]; then
     cp -r assets/icons/* "$WORK_DIR/usr/share/NexUSB/icons/"
 else
     echo "Warning: Icons directory not found"
 fi
 
-# Create desktop entry
+# desktop entry
 cat > "$WORK_DIR/usr/share/applications/NexUSB.desktop" << 'EOF'
 [Desktop Entry]
 Version=1.0
@@ -58,12 +58,12 @@ Categories=System;Utility;
 Keywords=rescue;recovery;malware;disk;network;
 EOF
 
-# Set GUI to auto-start
+# autostart
 mkdir -p "$WORK_DIR/etc/xdg/autostart"
 cp "$WORK_DIR/usr/share/applications/NexUSB.desktop" \
    "$WORK_DIR/etc/xdg/autostart/"
 
-# Configure Openbox to launch GUI
+# openbox launches the gui
 mkdir -p "$WORK_DIR/etc/xdg/openbox"
 cat > "$WORK_DIR/etc/xdg/openbox/autostart" << 'EOF'
 # Set wallpaper

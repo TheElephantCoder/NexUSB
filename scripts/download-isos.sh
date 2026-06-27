@@ -1,5 +1,5 @@
 #!/bin/bash
-# Download ISOs - automatic and manual
+# download isos, auto + manual
 
 ISO_DIR="build/isos"
 ISO_CONF="config/iso-collection.conf"
@@ -9,8 +9,7 @@ mkdir -p "$ISO_DIR"/{Linux,Security,Rescue,Antivirus,Windows,Tools}
 echo "=== NexUSB ISO Downloader ==="
 echo ""
 
-# Function to download ISO
-# Args: name, url, output, [checksum as "algo:hexdigest" e.g. "md5:abc..." or "sha256:..."]
+# download_iso name url output [checksum: algo:hexdigest]
 download_iso() {
     local name="$1"
     local url="$2"
@@ -53,7 +52,7 @@ download_iso() {
     return 0
 }
 
-# Download freely available rescue ISOs automatically
+# auto-download free rescue isos
 echo "Downloading essential rescue ISOs (this will take a while)..."
 echo ""
 
@@ -103,15 +102,14 @@ download_iso "Puppy Linux" \
     "$ISO_DIR/Linux/puppy.iso"
 
 echo "[10/10] Tiny Core Linux..."
-# NOTE: tinycorelinux.net does not offer HTTPS (port 443 refuses connections),
-# so we cannot use TLS here. Upstream only publishes an MD5 checksum, served over
-# the same HTTP channel, so verify integrity with the pinned MD5 below.
+# tinycorelinux.net has no https (443 refused), so http only.
+# upstream only publishes an md5 over the same channel; pin it below.
 download_iso "Tiny Core Linux" \
     "http://tinycorelinux.net/15.x/x86_64/release/TinyCorePure64-15.0.iso" \
     "$ISO_DIR/Linux/tinycore.iso" \
     "md5:11e9b4ce52825d9d221515e90e5ac1c3"
 
-# Extract zipped ISOs
+# unzip iso archives
 if [ -f "$ISO_DIR/Tools/memtest86plus.zip" ]; then
     unzip -o "$ISO_DIR/Tools/memtest86plus.zip" -d "$ISO_DIR/Tools/"
     rm "$ISO_DIR/Tools/memtest86plus.zip"
@@ -121,7 +119,7 @@ echo ""
 echo "=== Automatic Downloads Complete ==="
 echo ""
 
-# Create manual download list
+# manual download list
 cat << 'EOF' > "$ISO_DIR/MANUAL_DOWNLOADS.txt"
 === MANUAL ISO DOWNLOADS ===
 
@@ -245,7 +243,7 @@ Many distributions offer torrent downloads which are often faster:
 - Debian: Available via jigdo or torrent
 EOF
 
-# Create README
+# readme
 cat << 'EOF' > "$ISO_DIR/README.txt"
 NexUSB - ISO Collection
 
@@ -288,7 +286,7 @@ For more information:
 https://github.com/yourusername/NexUSB
 EOF
 
-# Create download helper script
+# helper script
 cat << 'SCRIPT' > "$ISO_DIR/download-popular.sh"
 #!/bin/bash
 # Download most popular ISOs

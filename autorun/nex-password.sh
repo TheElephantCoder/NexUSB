@@ -1,8 +1,7 @@
 #!/bin/bash
-# Password Tools Menu
+# password tools
 
-# --- Input validation helper ----------------------------------------------
-# Validate a partition device name (e.g. /dev/sda2, /dev/nvme0n1p3)
+# partition name (/dev/sda2, nvme0n1p3) + must be a real block dev
 validate_partition() {
     local part="$1"
     if [[ ! "$part" =~ ^/dev/(sd[a-z][0-9]+|nvme[0-9]+n[0-9]+p[0-9]+|vd[a-z][0-9]+)$ ]]; then

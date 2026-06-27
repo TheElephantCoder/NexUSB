@@ -1,5 +1,5 @@
 #!/bin/bash
-# Download Windows portable tools
+# download windows portable tools
 
 WINDOWS_DIR="build/windows-tools"
 TOOLS_CONF="config/windows-tools.conf"
@@ -10,7 +10,7 @@ mkdir -p "$WINDOWS_DIR"/{Antivirus,Recovery,SystemInfo,Utilities,Drivers,Network
 echo "=== NexUSB Windows Tools Downloader ==="
 echo ""
 
-# Function to download with progress
+# download_tool name url output category
 download_tool() {
     local name="$1"
     local url="$2"
@@ -27,11 +27,11 @@ download_tool() {
     fi
 }
 
-# Download freely available tools automatically
+# auto-download free tools
 echo "Downloading freely available tools..."
 echo ""
 
-# System Information Tools
+# system info
 echo "[1/15] System Information Tools..."
 download_tool "CPU-Z" \
     "https://download.cpuid.com/cpu-z/cpu-z_2.10-en.zip" \
@@ -53,7 +53,7 @@ download_tool "HWiNFO" \
     "https://sourceforge.net/projects/hwinfo/files/latest/download" \
     "hwinfo.zip" "SystemInfo"
 
-# Utilities
+# utilities
 echo "[2/15] System Utilities..."
 download_tool "7-Zip" \
     "https://www.7-zip.org/a/7z2408-x64.exe" \
@@ -79,7 +79,7 @@ download_tool "TreeSize Free" \
     "https://downloads.jam-software.de/treesize_free/TreeSizeFree-Portable.zip" \
     "TreeSizeFree.zip" "Utilities"
 
-# Recovery Tools
+# recovery
 echo "[3/15] Data Recovery Tools..."
 download_tool "Recuva" \
     "https://download.ccleaner.com/rcsetup153.exe" \
@@ -89,7 +89,7 @@ download_tool "TestDisk/PhotoRec Windows" \
     "https://www.cgsecurity.org/testdisk-7.2-WIP.win.zip" \
     "testdisk-win.zip" "Recovery"
 
-# Antivirus (Free/Portable versions)
+# antivirus (free/portable)
 echo "[4/15] Antivirus Tools..."
 download_tool "AdwCleaner" \
     "https://adwcleaner.malwarebytes.com/adwcleaner?channel=release" \
@@ -103,7 +103,7 @@ download_tool "Kaspersky Virus Removal Tool" \
     "https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe" \
     "KVRT.exe" "Antivirus"
 
-# Network Tools
+# network
 echo "[5/15] Network Tools..."
 download_tool "Angry IP Scanner" \
     "https://github.com/angryip/ipscan/releases/download/3.9.1/ipscan-3.9.1-setup.exe" \
@@ -121,13 +121,13 @@ download_tool "WinSCP" \
     "https://sourceforge.net/projects/winscp/files/latest/download" \
     "winscp.exe" "Network"
 
-# Browsers
+# browsers
 echo "[6/15] Portable Browsers..."
 download_tool "Firefox Portable" \
     "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US" \
     "firefox-setup.exe" "Browsers"
 
-# Office Tools
+# office
 echo "[7/15] Office Tools..."
 download_tool "Notepad++" \
     "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.9/npp.8.6.9.portable.x64.zip" \
@@ -137,7 +137,7 @@ download_tool "SumatraPDF" \
     "https://www.sumatrapdfreader.org/dl/rel/3.5.2/SumatraPDF-3.5.2-64.zip" \
     "SumatraPDF.zip" "Office"
 
-# Media Tools
+# media
 echo "[8/15] Media Tools..."
 download_tool "VLC Portable" \
     "https://get.videolan.org/vlc/last/win64/vlc-3.0.20-win64.zip" \
@@ -147,41 +147,41 @@ download_tool "IrfanView" \
     "https://www.irfanview.com/files/iview464_x64.zip" \
     "irfanview.zip" "Media"
 
-# Sysinternals Suite
+# sysinternals
 echo "[9/15] Sysinternals Suite..."
 download_tool "Sysinternals Suite" \
     "https://download.sysinternals.com/files/SysinternalsSuite.zip" \
     "SysinternalsSuite.zip" "Utilities"
 
-# Disk Tools
+# disk
 echo "[10/15] Disk Tools..."
 download_tool "HDDScan" \
     "https://hddscan.com/downloads/hddscan43.zip" \
     "hddscan.zip" "SystemInfo"
 
-# Driver Tools
+# drivers
 echo "[11/15] Driver Tools..."
 download_tool "Snappy Driver Installer" \
     "https://sdi-tool.org/SDI_R2309.zip" \
     "SDI.zip" "Drivers"
 
-# Backup Tools
+# backup
 echo "[12/15] Backup Tools..."
-# Note: Most backup tools require manual download
+# most backup tools are manual download
 
-# Registry Tools
+# registry
 echo "[13/15] Registry Tools..."
 download_tool "RegShot" \
     "https://sourceforge.net/projects/regshot/files/latest/download" \
     "regshot.zip" "Utilities"
 
-# Compression Tools
+# compression
 echo "[14/15] Additional Compression..."
 download_tool "PeaZip" \
     "https://github.com/peazip/PeaZip/releases/download/9.8.0/peazip_portable-9.8.0.WIN64.zip" \
     "peazip.zip" "Utilities"
 
-# File Managers
+# file managers
 echo "[15/15] File Managers..."
 download_tool "Total Commander" \
     "https://totalcmd.net/1101/tcmd101x64.exe" \
@@ -192,7 +192,7 @@ echo "=== Download Summary ==="
 echo "Automatic downloads completed for freely available tools."
 echo ""
 
-# Create README
+# readme
 cat << 'EOF' > "$WINDOWS_DIR/README.txt"
 NexUSB - Windows Tools Collection
 
@@ -225,7 +225,7 @@ For updates and more tools, visit:
 https://github.com/yourusername/NexUSB
 EOF
 
-# Create manual download list
+# manual download list
 cat << 'EOF' > "$WINDOWS_DIR/MANUAL_DOWNLOADS.txt"
 === MANUAL DOWNLOAD REQUIRED ===
 
@@ -317,7 +317,7 @@ INSTRUCTIONS:
 NOTE: Always download from official sources only!
 EOF
 
-# Create PowerShell helper script
+# powershell helper
 cat << 'SCRIPT' > "$WINDOWS_DIR/download-manual-tools.ps1"
 # PowerShell script to help download manual tools
 # Run as Administrator in Windows

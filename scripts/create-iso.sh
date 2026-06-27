@@ -1,5 +1,5 @@
 #!/bin/bash
-# Create bootable ISO
+# build the bootable iso
 
 ISO_DIR=$1
 OUTPUT_ISO=$2
@@ -8,7 +8,7 @@ source "$(dirname "$0")/arch-config.sh"
 echo "Creating ISO image (arch: $NEXUSB_ARCH)..."
 
 if [ "$HAS_BIOS" -eq 1 ]; then
-    # amd64: hybrid BIOS (El Torito + isohybrid MBR) and UEFI boot.
+    # amd64: hybrid bios (el torito + isohybrid mbr) + uefi
     xorriso -as mkisofs \
         -iso-level 3 \
         -full-iso9660-filenames \
@@ -30,7 +30,7 @@ if [ "$HAS_BIOS" -eq 1 ]; then
         /boot/grub/bios.img=boot/grub/bios.img \
         "/EFI/BOOT/$EFI_BOOT_NAME=EFI/BOOT/$EFI_BOOT_NAME"
 else
-    # arm64: UEFI-only (no Legacy BIOS / El Torito BIOS image).
+    # arm64: uefi-only, no bios el torito
     xorriso -as mkisofs \
         -iso-level 3 \
         -full-iso9660-filenames \

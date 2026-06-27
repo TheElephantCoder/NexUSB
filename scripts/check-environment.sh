@@ -1,12 +1,12 @@
 #!/bin/bash
-# Check build environment for NexUSB
+# preflight env check
 
 set -e
 
 echo "=== NexUSB Environment Check ==="
 echo ""
 
-# Color codes
+# colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -15,10 +15,10 @@ NC='\033[0m'
 ERRORS=0
 WARNINGS=0
 
-# Resolve target architecture settings (NEXUSB_ARCH, default amd64)
+# arch settings (NEXUSB_ARCH, default amd64)
 source "$(dirname "$0")/arch-config.sh"
 
-# Function to check command
+# required tool check
 check_command() {
     local cmd=$1
     local package=$2
@@ -33,7 +33,7 @@ check_command() {
     fi
 }
 
-# Function to check optional command
+# optional tool check
 check_optional() {
     local cmd=$1
     local package=$2
@@ -48,7 +48,7 @@ check_optional() {
     fi
 }
 
-# Check if running as root
+# root check
 echo "Checking permissions..."
 if [ "$EUID" -eq 0 ]; then
     echo -e "${YELLOW}⚠${NC} Running as root (build scripts will need sudo)"
@@ -57,7 +57,7 @@ else
 fi
 echo ""
 
-# Check required commands
+# required tools
 echo "Checking required tools (target arch: $NEXUSB_ARCH)..."
 check_command "debootstrap" "debootstrap"
 check_command "grub-mkstandalone" "grub2-common $GRUB_EFI_PKG"
@@ -74,14 +74,14 @@ check_command "convert" "imagemagick"
 check_command "wget" "wget"
 echo ""
 
-# Check optional tools
+# optional tools
 echo "Checking optional tools..."
 check_optional "git" "git"
 check_optional "python3" "python3"
 check_optional "dialog" "dialog"
 echo ""
 
-# Check disk space
+# disk space
 echo "Checking disk space..."
 AVAILABLE=$(df -BG . | tail -1 | awk '{print $4}' | sed 's/G//')
 AVAILABLE=${AVAILABLE:-0}
@@ -96,7 +96,7 @@ else
 fi
 echo ""
 
-# Check memory
+# memory
 echo "Checking system memory..."
 TOTAL_MEM=$(free -g | awk '/^Mem:/{print $2}')
 TOTAL_MEM=${TOTAL_MEM:-0}
@@ -111,7 +111,7 @@ else
 fi
 echo ""
 
-# Check internet connection
+# net check
 echo "Checking internet connection..."
 if ping -c 1 8.8.8.8 &> /dev/null; then
     echo -e "${GREEN}✓${NC} Internet connection available"
@@ -121,7 +121,7 @@ else
 fi
 echo ""
 
-# Check architecture (host vs build target)
+# host vs target arch
 echo "Checking system architecture..."
 ARCH=$(uname -m)
 case "$NEXUSB_ARCH" in
@@ -140,7 +140,7 @@ else
 fi
 echo ""
 
-# Check OS
+# os
 echo "Checking operating system..."
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -158,7 +158,7 @@ else
 fi
 echo ""
 
-# Summary
+# summary
 echo "=== Summary ==="
 if [ "$ERRORS" -eq 0 ] && [ "$WARNINGS" -eq 0 ]; then
     echo -e "${GREEN}✓ Environment is ready for building NexUSB${NC}"

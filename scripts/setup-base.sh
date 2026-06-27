@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup base Debian/Ubuntu system
+# debootstrap the base rootfs
 
 WORK_DIR=$1
 source "$(dirname "$0")/arch-config.sh"
@@ -14,7 +14,7 @@ deb $UBUNTU_MIRROR jammy-updates main restricted universe multiverse
 deb $UBUNTU_SECURITY_MIRROR jammy-security main restricted universe multiverse
 EOF
 
-# Chroot and update
+# update in chroot
 chroot "$WORK_DIR" apt update
 chroot "$WORK_DIR" apt upgrade -y
 

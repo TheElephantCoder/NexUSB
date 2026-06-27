@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-# Runs inside a WSL2 Ubuntu distro (as root) to build NexUSB on Windows 11.
-# Called by windows/Build-NexUSB.ps1.
+# runs inside WSL2 ubuntu (as root) to build NexUSB on windows. called by Build-NexUSB.ps1
 #   args: <minimal|full> <size_gb> <amd64|arm64> <repo_wsl_path>
-# The repo lives on the Windows drive (/mnt/...); debootstrap and squashfs
-# can't run there, so we stage onto WSL's ext4, build, then copy the ISO/IMG
-# back to <repo>/dist.
+# repo lives on /mnt (drvfs) where debootstrap/squashfs fail, so stage onto
+# ext4, build, then copy iso/img back to repo/dist
 set -euo pipefail
 
 TARGET="${1:-minimal}"
@@ -41,7 +39,7 @@ else
         grub-pc-bin grub-efi-amd64-bin isolinux syslinux syslinux-common syslinux-utils
 fi
 
-# Stage onto the WSL ext4 filesystem (NOT the /mnt DrvFs mount).
+# stage onto ext4, not the /mnt drvfs mount
 STAGE="/root/nexusb-build"
 echo ">> Staging source into $STAGE ..."
 mkdir -p "$STAGE"

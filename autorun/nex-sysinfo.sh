@@ -1,5 +1,5 @@
 #!/bin/bash
-# System Information Menu
+# system info
 
 choice=$(dialog --clear --backtitle "NexUSB - System Info" \
     --title "System Information" \

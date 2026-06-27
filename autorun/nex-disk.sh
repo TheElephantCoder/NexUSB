@@ -1,8 +1,7 @@
 #!/bin/bash
-# Disk Management Menu
+# disk tools
 
-# --- Input validation helpers ---------------------------------------------
-# Validate a whole-disk device name (e.g. /dev/sda, /dev/nvme0n1, /dev/vda)
+# whole-disk name (/dev/sda, nvme0n1, vda) + must be a real block dev
 validate_disk() {
     local dev="$1"
     if [[ ! "$dev" =~ ^/dev/(sd[a-z]|nvme[0-9]+n[0-9]+|vd[a-z])$ ]]; then

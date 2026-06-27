@@ -1,26 +1,12 @@
 #!/usr/bin/env bash
+# build NexUSB on any host by running the linux build in an ubuntu container
 #
-# Build NexUSB on any host (macOS incl. Apple Silicon, Intel, or Linux) by
-# running the existing Linux build inside an Ubuntu container of the target
-# architecture.
+# usage: docker/build-in-docker.sh [minimal|full] [usb_size_gb] [amd64|arm64]
 #
-# Usage:
-#   docker/build-in-docker.sh [minimal|full] [usb_size_gb] [amd64|arm64]
-#
-# Examples:
-#   docker/build-in-docker.sh                    # minimal amd64 ISO
-#   docker/build-in-docker.sh minimal "" arm64   # minimal arm64 ISO
-#   docker/build-in-docker.sh full 32 amd64      # full amd64 image
-#
-# Notes:
-#   - The container platform matches the target arch. On Apple Silicon,
-#     arm64 builds run NATIVELY (fast); amd64 builds run under emulation (slow),
-#     and vice-versa on Intel.
-#   - 'minimal' is the most reliable target. 'full' uses loop devices
-#     (losetup/mount) which can be unreliable inside Docker Desktop's VM even
-#     with --privileged; a full Linux VM is more dependable for that target.
-#   - arm64 media is UEFI-only and targets arm64 UEFI hardware. It does NOT
-#     boot on Apple Silicon Macs (no UEFI external boot).
+# notes:
+#   - container platform matches target arch; native arch is fast, other is emulated
+#   - 'full' uses loop devices, flaky under docker desktop; prefer a real linux vm
+#   - arm64 media is uefi-only, does NOT boot apple silicon macs
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -59,8 +45,7 @@ mkdir -p "$REPO_ROOT/dist"
 
 echo ">> [2/2] Running '$TARGET' build (linux/$ARCH) ..."
 if [ -n "${NEXUSB_ASSUME_YES:-}" ]; then
-    # Non-interactive (e.g. launched from the NexUSB Flasher app): no TTY,
-    # auto-confirm the build scripts' prompts.
+    # no tty (e.g. launched from the Flasher app); auto-confirm prompts
     docker run --rm \
         --platform "linux/$ARCH" \
         --privileged \

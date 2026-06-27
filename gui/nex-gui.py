@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-NexUSB Professional GUI with Real Tool Logos
-Modern, polished interface with actual application icons
-"""
+"""NexUSB GTK toolkit launcher."""
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -19,37 +16,32 @@ class NexUSBApp(Gtk.Window):
         self.set_default_size(1000, 700)
         self.set_position(Gtk.WindowPosition.CENTER)
         
-        # Set window icon
+        # window icon, ignore if missing
         try:
             self.set_icon_from_file("/usr/share/NexUSB/icons/nex-icon.png")
         except:
             pass
         
-        # Apply custom CSS styling
         self.apply_custom_style()
         
-        # Create main container
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.add(main_box)
         
-        # Header bar
         header = self.create_header()
         main_box.pack_start(header, False, False, 0)
         
-        # Content area with sidebar
+        # sidebar + content
         content_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         main_box.pack_start(content_box, True, True, 0)
         
-        # Sidebar
         sidebar = self.create_sidebar()
         content_box.pack_start(sidebar, False, False, 0)
         
-        # Main content area
         self.content_stack = Gtk.Stack()
         self.content_stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         content_box.pack_start(self.content_stack, True, True, 0)
         
-        # Add pages
+        # pages
         self.add_home_page()
         self.add_security_page()
         self.add_recovery_page()
@@ -58,12 +50,12 @@ class NexUSBApp(Gtk.Window):
         self.add_remote_page()
         self.add_system_page()
         
-        # Status bar
+        # status bar
         statusbar = self.create_statusbar()
         main_box.pack_start(statusbar, False, False, 0)
     
     def load_icon(self, icon_name, size=ICON_SIZE):
-        """Load tool icon from file or use fallback"""
+        """Load tool icon, fall back to theme."""
         icon_path = f"{ICON_PATH}/{icon_name}.png"
         
         try:
@@ -73,15 +65,15 @@ class NexUSBApp(Gtk.Window):
         except Exception as e:
             print(f"Error loading icon {icon_name}: {e}")
         
-        # Fallback to icon theme
+        # try icon theme
         try:
             return Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.DIALOG)
         except:
-            # Final fallback: colored box with letter
+            # last resort generic icon
             return Gtk.Image.new_from_icon_name("application-x-executable", Gtk.IconSize.DIALOG)
     
     def apply_custom_style(self):
-        """Apply custom CSS styling"""
+        """Load the CSS theme."""
         css_provider = Gtk.CssProvider()
         css = b"""
         window {
@@ -231,11 +223,10 @@ class NexUSBApp(Gtk.Window):
         )
     
     def create_header(self):
-        """Create professional header with logo"""
         header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
         header.get_style_context().add_class('header')
         
-        # Logo
+        # logo, fall back to text label
         try:
             logo_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
                 "/usr/share/NexUSB/icons/nex-logo.png", 200, 40, True
@@ -251,10 +242,9 @@ class NexUSBApp(Gtk.Window):
         subtitle.set_markup('<span color="#99ccff">Professional System Rescue Toolkit</span>')
         header.pack_start(subtitle, False, False, 0)
         
-        # Spacer
+        # spacer
         header.pack_start(Gtk.Box(), True, True, 0)
         
-        # Status
         status = Gtk.Label()
         status.set_markup('<span color="#66b3ff">v1.0 | Ready</span>')
         header.pack_end(status, False, False, 0)
@@ -262,7 +252,6 @@ class NexUSBApp(Gtk.Window):
         return header
     
     def create_sidebar(self):
-        """Create sidebar navigation"""
         sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         sidebar.get_style_context().add_class('sidebar')
         
@@ -297,7 +286,6 @@ class NexUSBApp(Gtk.Window):
         return sidebar
     
     def create_statusbar(self):
-        """Create status bar"""
         statusbar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         statusbar.get_style_context().add_class('statusbar')
         
@@ -317,27 +305,23 @@ class NexUSBApp(Gtk.Window):
         return statusbar
     
     def create_tool_card(self, icon_name, title, description, command):
-        """Create a tool card with actual logo"""
+        """Build one tool card (icon, title, desc, launch button)."""
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         card.get_style_context().add_class('tool-card')
         
-        # Icon
         icon = self.load_icon(icon_name, 64)
         card.pack_start(icon, False, False, 0)
         
-        # Title
         title_label = Gtk.Label()
         title_label.set_markup(f'<span weight="bold" size="large" color="#ffffff">{title}</span>')
         card.pack_start(title_label, False, False, 0)
         
-        # Description
         desc_label = Gtk.Label(label=description)
         desc_label.set_line_wrap(True)
         desc_label.set_max_width_chars(25)
         desc_label.get_style_context().add_class('tool-description')
         card.pack_start(desc_label, False, False, 0)
         
-        # Launch button
         btn = Gtk.Button(label="Launch")
         btn.get_style_context().add_class('action-button')
         btn.connect("clicked", self.launch_tool, command)
@@ -347,7 +331,7 @@ class NexUSBApp(Gtk.Window):
 
     
     def add_home_page(self):
-        """Add home page with quick actions"""
+        """Home page: welcome + quick-action cards."""
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -384,7 +368,7 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "home", "Home")
     
     def add_security_page(self):
-        """Add security tools page"""
+        # security tools
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -419,7 +403,7 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "security", "Security")
     
     def add_recovery_page(self):
-        """Add recovery tools page"""
+        # recovery / repair tools
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -454,7 +438,7 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "recovery", "Recovery")
     
     def add_disk_page(self):
-        """Add disk tools page"""
+        # disk tools
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -489,7 +473,7 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "disk", "Disk Tools")
     
     def add_network_page(self):
-        """Add network tools page"""
+        # network tools
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -524,7 +508,7 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "network", "Network")
     
     def add_remote_page(self):
-        """Add remote access page"""
+        # remote access tools
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -559,7 +543,7 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "remote", "Remote Access")
     
     def add_system_page(self):
-        """Add system info page"""
+        # system info tools
         scroll = Gtk.ScrolledWindow()
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         box.set_margin_start(30)
@@ -594,11 +578,9 @@ class NexUSBApp(Gtk.Window):
         self.content_stack.add_titled(scroll, "system", "System Info")
     
     def on_sidebar_clicked(self, button, page_name):
-        """Handle sidebar navigation"""
         self.content_stack.set_visible_child_name(page_name)
     
     def launch_tool(self, button, command):
-        """Launch a tool"""
         try:
             subprocess.Popen(command, shell=True)
         except Exception as e:
@@ -614,7 +596,6 @@ class NexUSBApp(Gtk.Window):
             dialog.destroy()
     
     def on_reboot(self, button):
-        """Reboot system"""
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=0,
@@ -629,7 +610,6 @@ class NexUSBApp(Gtk.Window):
         dialog.destroy()
     
     def on_shutdown(self, button):
-        """Shutdown system"""
         dialog = Gtk.MessageDialog(
             transient_for=self,
             flags=0,

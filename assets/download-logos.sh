@@ -1,6 +1,5 @@
 #!/bin/bash
-# Automated logo downloader and generator for NexUSB
-# This script downloads actual logos and creates fallbacks
+# download tool logos, generate fallbacks + branding
 
 ICON_DIR="assets/icons"
 TOOLS_DIR="$ICON_DIR/tools"
@@ -11,11 +10,11 @@ echo "  NexUSB Logo Downloader & Generator"
 echo "=========================================="
 echo ""
 
-# Check for required tools
+# need imagemagick + wget
 command -v convert >/dev/null 2>&1 || { echo "Error: ImageMagick not installed. Run: sudo apt install imagemagick"; exit 1; }
 command -v wget >/dev/null 2>&1 || { echo "Error: wget not installed. Run: sudo apt install wget"; exit 1; }
 
-# Function to download and convert logo
+# download + convert a logo
 download_logo() {
     local name="$1"
     local url="$2"
@@ -28,9 +27,9 @@ download_logo() {
     
     echo -n "  Downloading $name... "
     
-    # Try to download
+    # try download
     if wget -q --timeout=10 --tries=2 -O "/tmp/${name}_temp" "$url" 2>/dev/null; then
-        # Convert to 64x64 PNG
+        # to 64x64 png
         if convert "/tmp/${name}_temp" -resize 64x64 -background none -gravity center -extent 64x64 "$output" 2>/dev/null; then
             echo "✓"
             rm -f "/tmp/${name}_temp"
@@ -43,7 +42,7 @@ download_logo() {
     return 1
 }
 
-# Function to create fallback icon
+# fallback icon
 create_fallback() {
     local name="$1"
     local letter="$2"
@@ -112,14 +111,14 @@ create_fallback "crystaldiskmark" "CDM" "#cc9900"
 create_fallback "putty" "SSH" "#009900"
 create_fallback "filezilla" "FZ" "#cc0000"
 
-# Network tools
+# network tools
 create_fallback "tcpdump" "TCP" "#009999"
 create_fallback "iftop" "IF" "#0099cc"
 create_fallback "nethogs" "NH" "#00cccc"
 create_fallback "mtr" "MTR" "#0066cc"
 create_fallback "kismet" "K" "#6600cc"
 
-# Disk tools
+# disk tools
 create_fallback "fdisk" "FD" "#cc9900"
 create_fallback "parted" "P" "#cc6600"
 create_fallback "smart" "S" "#0066cc"
@@ -131,7 +130,7 @@ echo "  Creating NexUSB Branding"
 echo "=========================================="
 echo ""
 
-# Brand logo + app icon (from the bundled NexUSB-Logo.png)
+# brand logo + app icon from bundled NexUSB-Logo.png
 SOURCE_LOGO="$ICON_DIR/NexUSB-Logo.png"
 
 if [ -f "$SOURCE_LOGO" ]; then
@@ -153,7 +152,7 @@ else
         "$ICON_DIR/nex-icon.png"
 fi
 
-# Background (1920x1080)
+# background
 echo "Creating background..."
 convert -size 1920x1080 \
     -define gradient:angle=135 \
@@ -161,7 +160,7 @@ convert -size 1920x1080 \
     -blur 0x8 \
     "$ICON_DIR/background.png"
 
-# GRUB selection highlights
+# grub selection highlights
 echo "Creating GRUB theme elements..."
 convert -size 800x32 \
     gradient:'#0066cc-#003366' \
@@ -178,7 +177,7 @@ convert -size 16x32 \
     -alpha set -channel A -evaluate set 80% \
     "$ICON_DIR/select_e.png"
 
-# Category icons (128x128)
+# category icons (128x128)
 echo "Creating category icons..."
 create_category() {
     local name="$1"

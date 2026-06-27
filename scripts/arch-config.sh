@@ -1,7 +1,7 @@
 #!/bin/bash
-# Per-arch build settings. Source this; it reads NEXUSB_ARCH (amd64|arm64,
-# default amd64; x86_64/aarch64 also accepted) and exports DEB_ARCH, the apt
-# mirrors, the GRUB EFI format/package, the removable EFI name, and HAS_BIOS.
+# per-arch settings. source this. reads NEXUSB_ARCH (amd64|arm64, default
+# amd64; x86_64/aarch64 ok) and exports DEB_ARCH, apt mirrors, grub efi
+# format/pkg, efi boot name, HAS_BIOS.
 
 NEXUSB_ARCH="${NEXUSB_ARCH:-amd64}"
 
@@ -19,13 +19,13 @@ case "$NEXUSB_ARCH" in
     arm64|aarch64)
         NEXUSB_ARCH="arm64"
         DEB_ARCH="arm64"
-        # Ubuntu arm64 lives on ports.ubuntu.com, not archive.ubuntu.com.
+        # arm64 lives on ports.ubuntu.com, not archive
         UBUNTU_MIRROR="http://ports.ubuntu.com/ubuntu-ports"
         UBUNTU_SECURITY_MIRROR="http://ports.ubuntu.com/ubuntu-ports"
         GRUB_EFI_FORMAT="arm64-efi"
         GRUB_EFI_PKG="grub-efi-arm64-bin"
         EFI_BOOT_NAME="BOOTAA64.EFI"
-        HAS_BIOS=0          # arm64 is UEFI-only; no Legacy BIOS / syslinux
+        HAS_BIOS=0          # arm64 uefi-only, no bios/syslinux
         ;;
     *)
         echo "Error: unsupported NEXUSB_ARCH '$NEXUSB_ARCH' (use amd64 or arm64)" >&2

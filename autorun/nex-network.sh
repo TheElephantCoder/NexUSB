@@ -1,7 +1,6 @@
 #!/bin/bash
-# Network Diagnostics Menu
+# network diagnostics
 
-# --- Validation helpers ----------------------------------------------------
 validate_host() {
     [[ "$1" =~ ^[A-Za-z0-9._-]+$ ]] || return 1
     return 0

@@ -1,25 +1,24 @@
 #!/bin/bash
-# NexUSB Security & Malware Scanning Menu
-# Professional malware detection and removal
+# security / malware scanning menu
 
 DIALOG_HEIGHT=22
 DIALOG_WIDTH=75
 SCAN_LOG_DIR="/home/nex-scans"
 mkdir -p "$SCAN_LOG_DIR"
 
-# Secure temporary file for parsing scan output (unique, owner-only, auto-cleaned)
+# scratch file for parsing scan output, owner-only, cleaned on exit
 TEMP_SCAN_OUTPUT=$(mktemp /tmp/nex-scan.XXXXXXXXXX)
 chmod 600 "$TEMP_SCAN_OUTPUT"
 trap 'rm -f "$TEMP_SCAN_OUTPUT"' EXIT INT TERM
 
-# Colors for output
+# colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-# Validate a partition device name (e.g. /dev/sda2, /dev/nvme0n1p3)
+# partition name (/dev/sda2, nvme0n1p3) + must be a real block dev
 validate_partition() {
     local part="$1"
     if [[ ! "$part" =~ ^/dev/(sd[a-z][0-9]+|nvme[0-9]+n[0-9]+p[0-9]+|vd[a-z][0-9]+)$ ]]; then
@@ -33,12 +32,12 @@ validate_partition() {
     return 0
 }
 
-# Function to show scan progress
+# progress line
 show_progress() {
     echo -e "${BLUE}[SCANNING]${NC} $1"
 }
 
-# Function to show results
+# clean/infected line
 show_result() {
     local infected=$1
     if [ "$infected" -gt 0 ]; then
@@ -76,7 +75,7 @@ while true; do
             echo -e "${BLUE}╚════════════════════════════════════════════════════════╝${NC}"
             echo ""
             
-            # Auto-detect Windows partition
+            # find an ntfs partition
             show_progress "Detecting Windows partitions..."
             part=$(lsblk -f -n -o NAME,FSTYPE | grep ntfs | head -1 | awk '{print "/dev/"$1}')
             
@@ -100,11 +99,10 @@ while true; do
                 if mount -o ro "$part" "$MOUNT_POINT" 2>/dev/null; then
                     echo -e "${GREEN}✓ Mounted successfully (read-only)${NC}"
                     
-                    # Update definitions
                     show_progress "Updating virus definitions..."
                     freshclam 2>&1 | grep -E "updated|Database"
                     
-                    # Scan
+                    # scan
                     TIMESTAMP=$(date +%Y%m%d_%H%M%S)
                     LOG_FILE="$SCAN_LOG_DIR/windows_${TIMESTAMP}.log"
                     
@@ -115,14 +113,14 @@ while true; do
                     echo "Estimated time: 30-60 minutes"
                     echo ""
                     
-                    # Scan with progress
+                    # scan, exclude noisy/system dirs
                     clamscan -r -i --bell \
                         --exclude-dir="^/mnt/windows-scan/Windows/WinSxS" \
                         --exclude-dir="^/mnt/windows-scan/\$Recycle.Bin" \
                         --log="$LOG_FILE" \
                         "$MOUNT_POINT" | tee "$TEMP_SCAN_OUTPUT"
                     
-                    # Parse results
+                    # pull counts out of the log
                     INFECTED=$(grep "Infected files:" "$TEMP_SCAN_OUTPUT" | awk '{print $3}')
                     SCANNED=$(grep "Scanned files:" "$TEMP_SCAN_OUTPUT" | awk '{print $3}')
                     
@@ -192,7 +190,7 @@ while true; do
             echo "This will take 5-10 minutes."
             echo ""
             
-            # Scan common locations
+            # common malware spots
             for location in /home /tmp /var/tmp /mnt/*/Users/*/Downloads /mnt/*/Windows/Temp; do
                 if [ -d "$location" ]; then
                     echo "Scanning $location..."
@@ -414,7 +412,7 @@ while true; do
             read -p "Mount point name (e.g., windows): " mountname
             
             if [ -n "$part" ] && [ -n "$mountname" ] && validate_partition "$part"; then
-                # Restrict mount point name to a safe single path component
+                # keep mount name to one safe path component
                 if [[ ! "$mountname" =~ ^[A-Za-z0-9_-]+$ ]]; then
                     echo "Error: Invalid mount point name (use letters, digits, - or _)"
                     read -p "Press Enter to continue..."

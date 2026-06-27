@@ -1,5 +1,5 @@
 #!/bin/bash
-# NexUSB Main Menu
+# main menu
 
 DIALOG_HEIGHT=20
 DIALOG_WIDTH=70

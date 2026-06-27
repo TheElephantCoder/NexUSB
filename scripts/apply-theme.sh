@@ -1,5 +1,5 @@
 #!/bin/bash
-# Apply custom theme to boot menu
+# copy grub theme into iso
 
 ISO_DIR=$1
 

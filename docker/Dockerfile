@@ -1,16 +1,11 @@
 # syntax=docker/dockerfile:1
-# Multi-arch NexUSB build env. The container platform has to match the target
-# arch (debootstrap/apt run target-arch binaries), so --platform sets
-# TARGETARCH, which picks the GRUB packages below. ubuntu:22.04 = the suite
-# debootstrap pulls.
+# multi-arch build env. platform must match target arch; TARGETARCH picks grub pkgs below
 FROM ubuntu:22.04
 
 ARG TARGETARCH
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Architecture-independent build dependencies, plus arch-specific GRUB:
-#   amd64 -> Legacy BIOS (grub-pc-bin + syslinux) and UEFI (grub-efi-amd64-bin)
-#   arm64 -> UEFI only (grub-efi-arm64-bin); no BIOS / syslinux on arm64
+# common deps + arch-specific grub. amd64: bios+uefi, arm64: uefi only
 RUN apt-get update && apt-get install -y --no-install-recommends \
         debootstrap \
         grub2-common \
@@ -33,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
        fi \
     && rm -rf /var/lib/apt/lists/*
 
-# In-container orchestration script (copies source in, builds, copies ISO out).
+# build script that runs inside the container
 COPY container-build.sh /usr/local/bin/container-build.sh
 RUN chmod +x /usr/local/bin/container-build.sh
 

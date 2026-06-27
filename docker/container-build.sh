@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Runs inside the build container (not on the host).
-# /src is the repo, mounted read-only. We copy it to /build first because
-# debootstrap can't mknod / set ownership on the Docker bind mount. Finished
-# artifacts go to /out, which maps back to <repo>/dist.
+# runs inside the build container. /src is the repo (ro); copy to /build since
+# debootstrap can't mknod on the bind mount. artifacts go to /out -> repo/dist
 set -euo pipefail
 
 TARGET="${1:-minimal}"
@@ -15,7 +13,7 @@ fi
 
 echo ">> Staging source into container-local /build ..."
 mkdir -p /build
-# Exclude VCS metadata and any prior build output from the host.
+# skip vcs and old build output
 tar -C /src \
     --exclude='./.git' \
     --exclude='./build' \
@@ -25,7 +23,7 @@ tar -C /src \
 
 cd /build
 
-# Ensure scripts are executable regardless of how they arrived from the host.
+# make sure scripts are executable
 find /build -type f -name '*.sh' -exec chmod +x {} +
 chmod +x /build/gui/*.py 2>/dev/null || true
 
