@@ -107,6 +107,28 @@ sudo dd if=dist/NexUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
 
 For detailed instructions, see [QUICKSTART.md](QUICKSTART.md).
 
+## 🧱 Build Anywhere (Linux / macOS / Windows · x86_64 / arm64)
+
+The build is Linux-based but can run from any host, and targets x86_64 or arm64:
+
+```bash
+# Native Linux (x86_64 default)
+sudo ./build-minimal.sh
+sudo NEXUSB_ARCH=arm64 ./build-minimal.sh        # arm64
+
+# macOS or any host (Docker container)
+./docker/build-in-docker.sh minimal "" arm64     # or amd64
+
+# Windows 11 (ARM64/x64) via WSL2 — PowerShell
+.\windows\Build-NexUSB.ps1 -Target minimal -Arch arm64
+```
+
+See [BUILD.md](BUILD.md) and [windows/README.md](windows/README.md) for prerequisites and caveats.
+
+> **NexUSB Flasher** — a companion native macOS app (in `NexUSB-Flasher/`, its
+> own repository) can build (via Docker) and flash NexUSB images to a USB drive
+> with a guided wizard.
+
 ## 📖 Documentation
 
 - **[Quick Start Guide](QUICKSTART.md)** - Get started in 15 minutes
@@ -169,17 +191,23 @@ Built-in remote access tools for remote troubleshooting:
 ## 💻 System Requirements
 
 ### Build System
-- **OS:** Ubuntu 22.04+ or Debian 11+ (Linux)
+- **OS:** Linux (Ubuntu 22.04+ / Debian 11+) for a native build.
+  - **macOS or any host:** build inside the provided container — `./docker/build-in-docker.sh` (see [BUILD.md](BUILD.md)).
+  - **Windows 11 (ARM64/x64):** build via WSL2 — `windows/Build-NexUSB.ps1` (see [windows/README.md](windows/README.md)).
 - **Disk:** 50GB free space
 - **RAM:** 4GB minimum (8GB recommended)
 - **Network:** Internet connection required
 - **Time:** 30-90 minutes depending on build type
 
 ### Target System (Runtime)
-- **Architecture:** x86_64 (64-bit)
+- **Architecture:** x86_64 (amd64) or **arm64** — select with `NEXUSB_ARCH`
 - **RAM:** 2GB minimum (4GB recommended)
-- **Boot:** UEFI or Legacy BIOS
+- **Boot:** UEFI or Legacy BIOS (x86_64); **UEFI only** (arm64)
 - **USB:** 4GB for minimal, 32GB for full
+
+> **arm64 note:** arm64 media targets arm64 **UEFI** hardware (some arm64
+> laptops/servers, Windows-on-Arm devices). It does **not** boot Apple Silicon
+> Macs, which use a non-UEFI boot process.
 
 ## 🎨 Screenshots
 
