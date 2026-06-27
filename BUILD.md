@@ -70,12 +70,16 @@ sudo NEXUSB_BUILD_DIR=/mnt/ext/nexusb-build \
      ./build.sh
 ```
 
-- `NEXUSB_BUILD_DIR` — scratch/work directory (wiped on each run).
-- `NEXUSB_DIST_DIR` — where the finished ISO/IMG and checksums land.
+- `NEXUSB_BUILD_DIR` — scratch/work directory. **Wiped (`rm -rf`) on each run**,
+  so point it at a dedicated subdirectory you don't mind losing.
+- `NEXUSB_DIST_DIR` — where the finished ISO/IMG and checksums land. Only ever
+  **written to** (files are created/overwritten by name); it is never wiped,
+  reformatted, or erased, so existing files alongside the output are left alone.
 
-Point them at a dedicated subdirectory on the other disk, not a volume root —
-the build refuses obviously-dangerous targets (`/`, `$HOME`, a mount root) since
-the build dir is `rm -rf`'d each run.
+Neither variable touches the drive's partition table or filesystem — nothing
+here erases or formats a disk. Point `NEXUSB_BUILD_DIR` at a dedicated
+subdirectory, not a volume root: the build refuses obviously-dangerous targets
+(`/`, `$HOME`, a mount root) precisely because that dir is `rm -rf`'d each run.
 
 For the container build, `NEXUSB_DIST_DIR` (or the Flasher app's "Output folder")
 relocates the **output**; the container's intermediate files still use Docker's

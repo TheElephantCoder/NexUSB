@@ -100,8 +100,7 @@ log "Configuration: ${USB_SIZE}GB target size"
 
 echo -e "${BLUE}[1/10] Cleaning previous builds...${NC}"
 guard_dir "$BUILD_DIR"
-guard_dir "$DIST_DIR"
-rm -rf "$BUILD_DIR" "$DIST_DIR"
+rm -rf "$BUILD_DIR"
 mkdir -p "$WORK_DIR" "$ISO_DIR" "$DIST_DIR"
 
 echo -e "${BLUE}[1.5/10] Downloading tool logos...${NC}"
