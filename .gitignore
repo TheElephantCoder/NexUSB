@@ -58,3 +58,9 @@ test-*.sh
 # Local configuration
 local.conf
 .env
+
+# Standalone Xcode flasher app — tracked as its own separate git repository
+NexUSB-Flasher/
+
+# Kiro agent session data
+AGENT-RESOURCES/
