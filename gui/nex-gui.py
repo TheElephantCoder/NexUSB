@@ -21,7 +21,7 @@ class NexUSBApp(Gtk.Window):
         
         # Set window icon
         try:
-            self.set_icon_from_file("/usr/share/NexUSB/icons/nexus-icon.png")
+            self.set_icon_from_file("/usr/share/NexUSB/icons/nex-icon.png")
         except:
             pass
         
@@ -238,7 +238,7 @@ class NexUSBApp(Gtk.Window):
         # Logo
         try:
             logo_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                "/usr/share/NexUSB/icons/nexus-logo.png", 200, 40, True
+                "/usr/share/NexUSB/icons/nex-logo.png", 200, 40, True
             )
             logo = Gtk.Image.new_from_pixbuf(logo_pixbuf)
             header.pack_start(logo, False, False, 0)
@@ -327,7 +327,7 @@ class NexUSBApp(Gtk.Window):
         
         # Title
         title_label = Gtk.Label()
-        title_label.set_markup(f'<span class="tool-title">{title}</span>')
+        title_label.set_markup(f'<span weight="bold" size="large" color="#ffffff">{title}</span>')
         card.pack_start(title_label, False, False, 0)
         
         # Description

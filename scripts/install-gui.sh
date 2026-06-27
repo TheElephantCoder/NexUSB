@@ -35,7 +35,7 @@ fi
 # Copy GUI application
 mkdir -p "$WORK_DIR/usr/share/NexUSB"
 cp -r gui/* "$WORK_DIR/usr/share/NexUSB/"
-chmod +x "$WORK_DIR/usr/share/NexUSB/nexus-gui.py"
+chmod +x "$WORK_DIR/usr/share/NexUSB/nex-gui.py"
 
 # Copy icons
 if [ -d "assets/icons" ]; then
@@ -51,8 +51,8 @@ Version=1.0
 Type=Application
 Name=NexUSB Toolkit
 Comment=Professional System Rescue & Recovery
-Exec=/usr/share/NexUSB/nexus-gui.py
-Icon=/usr/share/NexUSB/icons/nexus-icon.png
+Exec=/usr/share/NexUSB/nex-gui.py
+Icon=/usr/share/NexUSB/icons/nex-icon.png
 Terminal=false
 Categories=System;Utility;
 Keywords=rescue;recovery;malware;disk;network;
@@ -70,7 +70,7 @@ cat > "$WORK_DIR/etc/xdg/openbox/autostart" << 'EOF'
 feh --bg-scale /usr/share/NexUSB/icons/background.png &
 
 # Launch NexUSB GUI
-/usr/share/NexUSB/nexus-gui.py &
+/usr/share/NexUSB/nex-gui.py &
 EOF
 
 echo "Professional GUI installed"

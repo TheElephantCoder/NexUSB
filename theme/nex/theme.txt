@@ -1,4 +1,4 @@
-# NexusUSB GRUB Theme
+# NexUSB GRUB Theme
 # Modern blue and black design
 
 # General settings
@@ -52,7 +52,7 @@ terminal-font: "Unifont Regular 16"
     top = 95%
     width = 100%
     height = 20
-    text = "NexusUSB v1.0 | Press 'e' to edit | Press 'c' for command line"
+    text = "NexUSB v1.0 | Press 'e' to edit | Press 'c' for command line"
     color = "#666666"
     font = "Unifont Regular 12"
     align = "center"

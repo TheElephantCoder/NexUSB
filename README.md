@@ -445,11 +445,11 @@ NexUSB/
 │   └── download-isos.sh  # Auto-download ISOs
 ├── theme/
 │   ├── grub.cfg          # GRUB configuration
-│   └── nexus/            # Theme assets
+│   └── nex/              # Theme assets
 ├── autorun/
-│   ├── nexus-menu.sh     # Main interactive menu
-│   ├── nexus-remote.sh   # Remote access menu
-│   └── nexus-*.sh        # Other menu scripts
+│   ├── nex-menu.sh       # Main interactive menu
+│   ├── nex-remote.sh     # Remote access menu
+│   └── nex-*.sh          # Other menu scripts
 └── docs/                 # Documentation
 ```
 
@@ -499,7 +499,7 @@ Place ISO files in `build/isos/` organized by category:
 - Tools/
 
 ### Customize Theme
-Edit files in `theme/nexus/`:
+Edit files in `theme/nex/`:
 - `theme.txt` - Colors and layout
 - `background.png` - Boot background
 - `logo.png` - NexUSB logo

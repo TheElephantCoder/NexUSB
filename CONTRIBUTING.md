@@ -27,7 +27,7 @@ To add a new tool to NexUSB:
 
 ## Theme Customization
 
-Theme files are in `theme/nexus/`. To customize:
+Theme files are in `theme/nex/`. To customize:
 
 - Edit `theme.txt` for layout and colors
 - Replace image files (background.png, logo.png, etc.)

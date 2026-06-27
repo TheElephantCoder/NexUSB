@@ -101,8 +101,8 @@ sudo ./build.sh
 
 Replace these files before building:
 ```
-assets/icons/nexus-logo.png (400x80) - Header logo
-assets/icons/nexus-icon.png (256x256) - App icon
+assets/icons/nex-logo.png (400x80) - Header logo
+assets/icons/nex-icon.png (256x256) - App icon
 assets/icons/background.png (1920x1080) - Wallpaper
 ```
 

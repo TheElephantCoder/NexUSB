@@ -120,17 +120,17 @@ Replace default icons with your own:
 
 ```bash
 # Logo (header)
-assets/icons/nexus-logo.png (400x80)
+assets/icons/nex-logo.png (400x80)
 
 # App icon
-assets/icons/nexus-icon.png (256x256)
+assets/icons/nex-icon.png (256x256)
 
 # Background
 assets/icons/background.png (1920x1080)
 
 # GRUB theme
-theme/nexus/background.png (1920x1080)
-theme/nexus/logo.png (400x80)
+theme/nex/background.png (1920x1080)
+theme/nex/logo.png (400x80)
 ```
 
 ### Creating Custom Icons
@@ -146,9 +146,9 @@ Or create manually with ImageMagick:
 # Logo with gradient text
 convert -size 400x80 xc:transparent \
     -font "DejaVu-Sans-Bold" -pointsize 48 \
-    -fill "#66b3ff" -annotate +10+60 "Nexus" \
-    -fill "#0066cc" -annotate +200+60 "USB" \
-    nexus-logo.png
+    -fill "#66b3ff" -annotate +10+60 "Nex" \
+    -fill "#0066cc" -annotate +140+60 "USB" \
+    nex-logo.png
 
 # Background gradient
 convert -size 1920x1080 \
@@ -194,7 +194,7 @@ No command-line interaction needed!
 Edit the GUI:
 ```bash
 # Main GUI file
-gui/nexus-gui.py
+gui/nex-gui.py
 
 # Modify colors in CSS section
 # Change layout in page creation methods
