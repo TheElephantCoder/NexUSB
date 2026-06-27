@@ -2,6 +2,7 @@
 # essential tools only
 
 WORK_DIR=$1
+source "$(dirname "$0")/arch-config.sh"
 
 # mount kernel virtual filesystems into the chroot so package postinst
 # scripts behave (anydesk probes /proc/1/exe; apt wants /dev/pts). unmounted
@@ -86,33 +87,39 @@ chroot "$WORK_DIR" apt install -y --no-install-recommends \
     vim-tiny \
     htop
 
-# teamviewer + anydesk
-echo "Downloading remote access tools..."
-mkdir -p "$WORK_DIR/opt/remote-tools"
+# teamviewer + anydesk (proprietary, amd64-only debs). their vendors don't
+# ship matching arm64 .debs for this pinned setup, so skip them on arm64 —
+# the open-source remote tools (remmina, xrdp, ssh, vnc) above still apply.
+if [ "$DEB_ARCH" = "amd64" ]; then
+    echo "Downloading remote access tools..."
+    mkdir -p "$WORK_DIR/opt/remote-tools"
 
-# teamviewer
-wget -O "$WORK_DIR/opt/remote-tools/teamviewer.deb" \
-    "https://download.teamviewer.com/download/linux/teamviewer_amd64.deb" || true
+    # teamviewer
+    wget -O "$WORK_DIR/opt/remote-tools/teamviewer.deb" \
+        "https://download.teamviewer.com/download/linux/teamviewer_amd64.deb" || true
 
-# anydesk
-wget -O "$WORK_DIR/opt/remote-tools/anydesk.deb" \
-    "https://download.anydesk.com/linux/anydesk_6.3.2-1_amd64.deb" || true
+    # anydesk
+    wget -O "$WORK_DIR/opt/remote-tools/anydesk.deb" \
+        "https://download.anydesk.com/linux/anydesk_6.3.2-1_amd64.deb" || true
 
-# install via apt so dependencies resolve in one step. if a package still
-# fails to configure (e.g. virtual filesystems unavailable), purge it so the
-# dpkg db stays clean and squashfs never captures a half-configured package;
-# the .deb is left under /opt/remote-tools for manual install at first boot.
-for tool in teamviewer anydesk; do
-    deb="/opt/remote-tools/$tool.deb"
-    if [ -s "$WORK_DIR$deb" ]; then
-        echo "Installing $tool..."
-        if ! chroot "$WORK_DIR" apt install -y --no-install-recommends "$deb"; then
-            echo "Warning: $tool did not configure; keeping the .deb in /opt/remote-tools for manual install"
-            chroot "$WORK_DIR" apt-get purge -y "$tool" 2>/dev/null || true
-            chroot "$WORK_DIR" dpkg --purge --force-remove-reinstreq "$tool" 2>/dev/null || true
+    # install via apt so dependencies resolve in one step. if a package still
+    # fails to configure (e.g. virtual filesystems unavailable), purge it so the
+    # dpkg db stays clean and squashfs never captures a half-configured package;
+    # the .deb is left under /opt/remote-tools for manual install at first boot.
+    for tool in teamviewer anydesk; do
+        deb="/opt/remote-tools/$tool.deb"
+        if [ -s "$WORK_DIR$deb" ]; then
+            echo "Installing $tool..."
+            if ! chroot "$WORK_DIR" apt install -y --no-install-recommends "$deb"; then
+                echo "Warning: $tool did not configure; keeping the .deb in /opt/remote-tools for manual install"
+                chroot "$WORK_DIR" apt-get purge -y "$tool" 2>/dev/null || true
+                chroot "$WORK_DIR" dpkg --purge --force-remove-reinstreq "$tool" 2>/dev/null || true
+            fi
         fi
-    fi
-done
+    done
+else
+    echo "Skipping TeamViewer/AnyDesk (no arm64 .deb); using remmina/xrdp/ssh/vnc"
+fi
 
 # make sure nothing is left half-configured before the squashfs is built
 chroot "$WORK_DIR" dpkg --configure -a 2>/dev/null || true
