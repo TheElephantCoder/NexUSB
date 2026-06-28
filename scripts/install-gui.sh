@@ -94,6 +94,7 @@ greeter=/usr/lib/lxdm/lxdm-greeter-gtk
 arg=/usr/bin/X -background vt1
 
 [display]
+theme=Industrial
 gtk_theme=Adwaita
 EOF
 
@@ -101,6 +102,25 @@ EOF
 if [ -f "$WORK_DIR/etc/pam.d/lxdm" ]; then
     sed -i 's/^\(auth.*pam_succeed_if.*user.*!= *root.*\)/# \1/' \
         "$WORK_DIR/etc/pam.d/lxdm" 2>/dev/null || true
+fi
+
+# Brand the greeter: the lxdm GTK themes show a top image (login.png) and have
+# no title label, so render a "NexUSB Login" banner and drop it in as login.png
+# for every installed theme. Plain text only (no markup/semicolons).
+echo "Branding the login greeter..."
+nex_login_banner="$WORK_DIR/tmp/nex-login.png"
+if convert -size 460x110 xc:none -gravity center \
+        -stroke black -strokewidth 2 -fill white -pointsize 38 \
+        -annotate 0 "NexUSB Login" "$nex_login_banner" 2>/dev/null; then
+    for theme_dir in "$WORK_DIR"/usr/share/lxdm/themes/*/; do
+        [ -d "$theme_dir" ] || continue
+        if [ -f "$theme_dir/greeter.ui" ] || [ -f "$theme_dir/greeter-gtk3.ui" ]; then
+            cp "$nex_login_banner" "$theme_dir/login.png"
+        fi
+    done
+    rm -f "$nex_login_banner"
+else
+    echo "Warning: could not render login banner (convert failed)"
 fi
 
 echo "Professional GUI installed"
