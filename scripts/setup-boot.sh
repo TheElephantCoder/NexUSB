@@ -24,6 +24,21 @@ grub-mkstandalone \
     --fonts="" \
     "boot/grub/grub.cfg=theme/grub.cfg"
 
+# Build a FAT EFI System Partition image holding /EFI/BOOT/<name>. UEFI
+# firmware mounts the ESP as FAT, so the appended partition (and El Torito
+# EFI image) MUST be a filesystem image, not the bare .efi binary — otherwise
+# the stick never appears in the UEFI boot menu.
+echo "Creating FAT EFI System Partition image (efiboot.img)..."
+EFI_IMG="$ISO_DIR/boot/grub/efiboot.img"
+efi_bin="$ISO_DIR/EFI/BOOT/$EFI_BOOT_NAME"
+efi_kb=$(( $(stat -c%s "$efi_bin") / 1024 + 1024 ))   # binary + 1 MiB slack
+[ "$efi_kb" -lt 2048 ] && efi_kb=2048                 # keep FAT16 valid
+rm -f "$EFI_IMG"
+dd if=/dev/zero of="$EFI_IMG" bs=1024 count="$efi_kb" status=none
+mkfs.vfat -F 16 -n NEXEFI "$EFI_IMG" >/dev/null
+mmd   -i "$EFI_IMG" ::/EFI ::/EFI/BOOT
+mcopy -i "$EFI_IMG" "$efi_bin" "::/EFI/BOOT/$EFI_BOOT_NAME"
+
 if [ "$HAS_BIOS" -eq 1 ]; then
     echo "Installing GRUB (Legacy BIOS: i386-pc)..."
     # i386-pc core.img must fit the El Torito embed limit (~0x78000). By

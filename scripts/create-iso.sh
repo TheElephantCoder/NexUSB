@@ -23,9 +23,9 @@ if [ "$HAS_BIOS" -eq 1 ]; then
         --grub2-boot-info \
         --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img \
         -eltorito-alt-boot \
-        -e "EFI/BOOT/$EFI_BOOT_NAME" \
+        -e boot/grub/efiboot.img \
         -no-emul-boot \
-        -append_partition 2 0xef "$ISO_DIR/EFI/BOOT/$EFI_BOOT_NAME" \
+        -append_partition 2 0xef "$ISO_DIR/boot/grub/efiboot.img" \
         -output "$OUTPUT_ISO" \
         "$ISO_DIR"
 else
@@ -34,9 +34,9 @@ else
         -iso-level 3 \
         -full-iso9660-filenames \
         -volid "NexUSB" \
-        -e "EFI/BOOT/$EFI_BOOT_NAME" \
+        -e boot/grub/efiboot.img \
         -no-emul-boot \
-        -append_partition 2 0xef "$ISO_DIR/EFI/BOOT/$EFI_BOOT_NAME" \
+        -append_partition 2 0xef "$ISO_DIR/boot/grub/efiboot.img" \
         -output "$OUTPUT_ISO" \
         "$ISO_DIR"
 fi
