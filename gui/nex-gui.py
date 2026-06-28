@@ -6,6 +6,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf, Gio
 import subprocess
 import os
+import shutil
 
 ICON_PATH = "/usr/share/NexUSB/icons/tools"
 ICON_SIZE = 64
@@ -329,6 +330,33 @@ class NexUSBApp(Gtk.Window):
         
         return card
 
+    def build_tool_grid(self, tools):
+        """Build a grid of cards, but only for tools whose binary exists on
+        this build. Tools are (icon, title, desc, command, probe); a tool is
+        shown only when `probe` resolves on PATH. Returns a placeholder label
+        when nothing in the category is installed."""
+        grid = Gtk.FlowBox()
+        grid.set_valign(Gtk.Align.START)
+        grid.set_max_children_per_line(4)
+        grid.set_selection_mode(Gtk.SelectionMode.NONE)
+        
+        shown = 0
+        for icon, title, desc, command, probe in tools:
+            if probe and not shutil.which(probe):
+                continue
+            grid.add(self.create_tool_card(icon, title, desc, command))
+            shown += 1
+        
+        if shown == 0:
+            placeholder = Gtk.Label()
+            placeholder.set_markup(
+                '<span color="#99ccff">No tools from this category are '
+                'installed in this build.</span>'
+            )
+            placeholder.set_halign(Gtk.Align.START)
+            return placeholder
+        return grid
+
     
     def add_home_page(self):
         """Home page: welcome + quick-action cards."""
@@ -351,19 +379,19 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         quick_actions = [
-            ("clamav", "Malware Scan", "Scan for viruses", "clamtk"),
-            ("testdisk", "Data Recovery", "Recover lost files", "testdisk"),
-            ("gparted", "Disk Manager", "Manage partitions", "gparted"),
-            ("wireshark", "Network Tools", "Analyze traffic", "wireshark"),
-            ("remmina", "Remote Access", "Connect remotely", "remmina"),
-            ("hardinfo", "System Info", "View hardware", "hardinfo"),
+            ("clamav", "Malware Scan", "Scan for viruses",
+             "x-terminal-emulator -e 'sudo clamscan -r -i /; exec bash'", "clamscan"),
+            ("testdisk", "Data Recovery", "Recover lost files",
+             "x-terminal-emulator -e 'sudo testdisk; exec bash'", "testdisk"),
+            ("gparted", "Disk Manager", "Manage partitions", "gparted", "gparted"),
+            ("nmap", "Network Tools", "Scan the network",
+             "x-terminal-emulator -e 'nmap --help; exec bash'", "nmap"),
+            ("remmina", "Remote Access", "Connect remotely", "remmina", "remmina"),
+            ("htop", "System Monitor", "Monitor resources",
+             "x-terminal-emulator -e htop", "htop"),
         ]
         
-        for icon, title, desc, cmd in quick_actions:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(quick_actions), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "home", "Home")
     
@@ -386,19 +414,19 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         tools = [
-            ("clamav", "ClamAV", "Antivirus scanner", "clamtk"),
-            ("chkrootkit", "Rootkit Hunter", "Detect rootkits", "x-terminal-emulator -e 'sudo chkrootkit; read'"),
-            ("lynis", "Security Audit", "System security check", "x-terminal-emulator -e 'sudo lynis audit system; read'"),
-            ("nmap", "Network Scanner", "Scan for threats", "zenmap"),
-            ("aircrack", "WiFi Security", "Wireless auditing", "x-terminal-emulator -e aircrack-ng"),
-            ("metasploit", "Metasploit", "Penetration testing", "x-terminal-emulator -e msfconsole"),
+            ("clamav", "ClamAV", "Antivirus scanner",
+             "x-terminal-emulator -e 'sudo clamscan -r -i /; exec bash'", "clamscan"),
+            ("chkrootkit", "chkrootkit", "Detect rootkits",
+             "x-terminal-emulator -e 'sudo chkrootkit; exec bash'", "chkrootkit"),
+            ("rkhunter", "rkhunter", "Rootkit hunter",
+             "x-terminal-emulator -e 'sudo rkhunter --check; exec bash'", "rkhunter"),
+            ("lynis", "Security Audit", "System security check",
+             "x-terminal-emulator -e 'sudo lynis audit system; exec bash'", "lynis"),
+            ("nmap", "Network Scanner", "Scan for open ports",
+             "x-terminal-emulator -e 'nmap --help; exec bash'", "nmap"),
         ]
         
-        for icon, title, desc, cmd in tools:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(tools), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "security", "Security")
     
@@ -421,19 +449,19 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         tools = [
-            ("testdisk", "TestDisk", "Recover partitions", "x-terminal-emulator -e 'sudo testdisk; read'"),
-            ("photorec", "PhotoRec", "Recover files", "x-terminal-emulator -e 'sudo photorec; read'"),
-            ("bootrepair", "Boot Repair", "Fix boot problems", "boot-repair"),
-            ("clonezilla", "Clonezilla", "Clone disk", "x-terminal-emulator -e clonezilla"),
-            ("foremost", "Foremost", "File carving", "x-terminal-emulator -e foremost"),
-            ("ddrescue", "ddrescue", "Rescue damaged drives", "x-terminal-emulator -e ddrescue"),
+            ("testdisk", "TestDisk", "Recover partitions",
+             "x-terminal-emulator -e 'sudo testdisk; exec bash'", "testdisk"),
+            ("photorec", "PhotoRec", "Carve deleted files",
+             "x-terminal-emulator -e 'sudo photorec; exec bash'", "photorec"),
+            ("ddrescue", "ddrescue", "Rescue failing drives",
+             "x-terminal-emulator -e 'ddrescue --help; exec bash'", "ddrescue"),
+            ("foremost", "Foremost", "File carving",
+             "x-terminal-emulator -e 'sudo foremost -h; exec bash'", "foremost"),
+            ("clonezilla", "Clonezilla", "Clone a disk",
+             "x-terminal-emulator -e 'sudo clonezilla; exec bash'", "clonezilla"),
         ]
         
-        for icon, title, desc, cmd in tools:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(tools), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "recovery", "Recovery")
     
@@ -456,19 +484,18 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         tools = [
-            ("gparted", "GParted", "Partition editor", "gparted"),
-            ("baobab", "Disk Usage", "Analyze space", "baobab"),
-            ("smart", "SMART Check", "Check disk health", "gnome-disks"),
-            ("crystaldiskinfo", "CrystalDiskInfo", "Disk health (Win)", "wine /path/to/CrystalDiskInfo.exe"),
-            ("crystaldiskmark", "CrystalDiskMark", "Disk benchmark", "gnome-disks"),
-            ("fdisk", "fdisk", "Partition tool", "x-terminal-emulator -e 'sudo fdisk -l; read'"),
+            ("gparted", "GParted", "Partition editor", "gparted", "gparted"),
+            ("fdisk", "fdisk", "List/edit partitions",
+             "x-terminal-emulator -e 'sudo fdisk -l; exec bash'", "fdisk"),
+            ("parted", "parted", "Partition tool",
+             "x-terminal-emulator -e 'sudo parted -l; exec bash'", "parted"),
+            ("smart", "SMART Check", "Check disk health",
+             "x-terminal-emulator -e 'sudo smartctl --scan; exec bash'", "smartctl"),
+            ("gnome-disks", "Disks", "Disk utility", "gnome-disks", "gnome-disks"),
+            ("baobab", "Disk Usage", "Analyze space", "baobab", "baobab"),
         ]
         
-        for icon, title, desc, cmd in tools:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(tools), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "disk", "Disk Tools")
     
@@ -491,19 +518,18 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         tools = [
-            ("wireshark", "Wireshark", "Packet analyzer", "wireshark"),
-            ("nmap", "Nmap", "Network scanner", "zenmap"),
-            ("iftop", "Bandwidth Monitor", "Monitor traffic", "x-terminal-emulator -e 'sudo iftop; read'"),
-            ("kismet", "WiFi Analyzer", "Analyze WiFi", "kismet"),
-            ("nethogs", "Network Config", "Configure network", "nm-connection-editor"),
-            ("tcpdump", "tcpdump", "Packet capture", "x-terminal-emulator -e 'sudo tcpdump; read'"),
+            ("nmap", "Nmap", "Network scanner",
+             "x-terminal-emulator -e 'nmap --help; exec bash'", "nmap"),
+            ("tcpdump", "tcpdump", "Packet capture",
+             "x-terminal-emulator -e 'sudo tcpdump -D; exec bash'", "tcpdump"),
+            ("nethogs", "Network Config", "Configure network",
+             "x-terminal-emulator -e 'nmtui; exec bash'", "nmtui"),
+            ("ssh", "Netcat", "TCP/UDP tool",
+             "x-terminal-emulator -e 'nc -h; exec bash'", "nc"),
+            ("wireshark", "Wireshark", "Packet analyzer", "wireshark", "wireshark"),
         ]
         
-        for icon, title, desc, cmd in tools:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(tools), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "network", "Network")
     
@@ -526,19 +552,16 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         tools = [
-            ("remmina", "Remmina", "RDP/VNC client", "remmina"),
-            ("vnc", "VNC Server", "Share screen", "x-terminal-emulator -e 'x11vnc -display :0; read'"),
-            ("ssh", "SSH Client", "Secure shell", "x-terminal-emulator"),
-            ("teamviewer", "TeamViewer", "Remote support", "teamviewer"),
-            ("anydesk", "AnyDesk", "Remote desktop", "anydesk"),
-            ("xrdp", "RDP Server", "Accept RDP", "x-terminal-emulator -e 'sudo systemctl start xrdp; read'"),
+            ("remmina", "Remmina", "RDP/VNC client", "remmina", "remmina"),
+            ("vnc", "VNC Viewer", "Connect to VNC",
+             "x-terminal-emulator -e 'xvncviewer; exec bash'", "xvncviewer"),
+            ("ssh", "SSH Client", "Secure shell",
+             "x-terminal-emulator -e 'echo \"Usage: ssh user@host\"; exec bash'", "ssh"),
+            ("xrdp", "RDP Server", "Accept RDP connections",
+             "x-terminal-emulator -e 'sudo systemctl start xrdp; systemctl status xrdp; exec bash'", "xrdp"),
         ]
         
-        for icon, title, desc, cmd in tools:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(tools), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "remote", "Remote Access")
     
@@ -561,19 +584,21 @@ class NexUSBApp(Gtk.Window):
         grid.set_selection_mode(Gtk.SelectionMode.NONE)
         
         tools = [
-            ("hardinfo", "Hardware Info", "View hardware", "hardinfo"),
-            ("htop", "System Monitor", "Monitor resources", "x-terminal-emulator -e htop"),
-            ("cpuz", "CPU-Z", "CPU details (Win)", "wine /path/to/cpuz.exe"),
-            ("memtest", "Memory Test", "Test RAM", "x-terminal-emulator -e memtester"),
-            ("sensors", "Sensors", "Temperature & fans", "psensor"),
-            ("lshw", "System Report", "Generate report", "x-terminal-emulator -e 'sudo lshw; read'"),
+            ("htop", "System Monitor", "Processes & resources",
+             "x-terminal-emulator -e htop", "htop"),
+            ("hardinfo", "CPU Info", "Processor details",
+             "x-terminal-emulator -e 'lscpu; exec bash'", "lscpu"),
+            ("memtest", "Memory", "RAM usage",
+             "x-terminal-emulator -e 'free -h; exec bash'", "free"),
+            ("fdisk", "Block Devices", "Disks & partitions",
+             "x-terminal-emulator -e 'lsblk; exec bash'", "lsblk"),
+            ("lshw", "Hardware Report", "Full hardware list",
+             "x-terminal-emulator -e 'sudo lshw -short; exec bash'", "lshw"),
+            ("sensors", "Sensors", "Temperatures & fans",
+             "x-terminal-emulator -e 'sensors; exec bash'", "sensors"),
         ]
         
-        for icon, title, desc, cmd in tools:
-            card = self.create_tool_card(icon, title, desc, cmd)
-            grid.add(card)
-        
-        box.pack_start(grid, True, True, 0)
+        box.pack_start(self.build_tool_grid(tools), True, True, 0)
         scroll.add(box)
         self.content_stack.add_titled(scroll, "system", "System Info")
     
