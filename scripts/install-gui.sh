@@ -73,4 +73,34 @@ feh --bg-scale /usr/share/NexUSB/icons/background.png &
 /usr/share/NexUSB/nex-gui.py &
 EOF
 
+# --- live login ---
+# the rescue tools need root (dd, mount, shred, fdisk, ...), so boot straight
+# into the openbox desktop as root via lxdm autologin. a known root password
+# is also set so the TTYs / su work. SECURITY: this is a live rescue image with
+# a well-known password; do not expose it to untrusted networks or enable the
+# RDP/SSH servers on it without changing the password first.
+echo "Configuring live autologin..."
+echo "root:nexusb" | chroot "$WORK_DIR" chpasswd
+
+mkdir -p "$WORK_DIR/etc/lxdm"
+cat > "$WORK_DIR/etc/lxdm/lxdm.conf" << 'EOF'
+[base]
+# autologin straight into the desktop, no prompt
+autologin=root
+session=/usr/bin/openbox-session
+greeter=/usr/lib/lxdm/lxdm-greeter-gtk
+
+[server]
+arg=/usr/bin/X -background vt1
+
+[display]
+gtk_theme=Adwaita
+EOF
+
+# allow root to start a graphical session
+if [ -f "$WORK_DIR/etc/pam.d/lxdm" ]; then
+    sed -i 's/^\(auth.*pam_succeed_if.*user.*!= *root.*\)/# \1/' \
+        "$WORK_DIR/etc/pam.d/lxdm" 2>/dev/null || true
+fi
+
 echo "Professional GUI installed"
