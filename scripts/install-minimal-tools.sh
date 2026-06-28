@@ -88,9 +88,12 @@ chroot "$WORK_DIR" apt install -y --no-install-recommends \
     htop
 
 # teamviewer + anydesk (proprietary, amd64-only debs). their vendors don't
-# ship matching arm64 .debs for this pinned setup, so skip them on arm64 —
-# the open-source remote tools (remmina, xrdp, ssh, vnc) above still apply.
-if [ "$DEB_ARCH" = "amd64" ]; then
+# ship matching arm64 .debs for this pinned setup, so skip them on arm64 — the
+# open-source remote tools (remmina, xrdp, ssh, vnc) above still apply. set
+# NEXUSB_SKIP_PROPRIETARY=1 to leave them out of a build entirely.
+if [ -n "${NEXUSB_SKIP_PROPRIETARY:-}" ]; then
+    echo "Skipping TeamViewer/AnyDesk (NEXUSB_SKIP_PROPRIETARY set)"
+elif [ "$DEB_ARCH" = "amd64" ]; then
     echo "Downloading remote access tools..."
     mkdir -p "$WORK_DIR/opt/remote-tools"
 

@@ -31,10 +31,13 @@ grub-mkstandalone \
 echo "Creating FAT EFI System Partition image (efiboot.img)..."
 EFI_IMG="$ISO_DIR/boot/grub/efiboot.img"
 efi_bin="$ISO_DIR/EFI/BOOT/$EFI_BOOT_NAME"
-efi_kb=$(( $(stat -c%s "$efi_bin") / 1024 + 1024 ))   # binary + 1 MiB slack
-[ "$efi_kb" -lt 2048 ] && efi_kb=2048                 # keep FAT16 valid
+[ -s "$efi_bin" ] || { echo "Error: GRUB EFI binary missing ($efi_bin)"; exit 1; }
+# size in whole MiB: binary + 4 MiB slack, min 16 MiB so mkfs.vfat picks FAT16
+# (a few-MiB image falls below FAT16's minimum cluster count -> "too small").
+efi_mb=$(( $(stat -c%s "$efi_bin") / 1048576 + 4 ))
+[ "$efi_mb" -lt 16 ] && efi_mb=16
 rm -f "$EFI_IMG"
-dd if=/dev/zero of="$EFI_IMG" bs=1024 count="$efi_kb" status=none
+dd if=/dev/zero of="$EFI_IMG" bs=1M count="$efi_mb" status=none
 mkfs.vfat -F 16 -n NEXEFI "$EFI_IMG" >/dev/null
 mmd   -i "$EFI_IMG" ::/EFI ::/EFI/BOOT
 mcopy -i "$EFI_IMG" "$efi_bin" "::/EFI/BOOT/$EFI_BOOT_NAME"
