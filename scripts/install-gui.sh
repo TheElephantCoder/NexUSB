@@ -74,19 +74,18 @@ feh --bg-scale /usr/share/NexUSB/icons/background.png &
 EOF
 
 # --- live login ---
-# the rescue tools need root (dd, mount, shred, fdisk, ...), so boot straight
-# into the openbox desktop as root via lxdm autologin. a known root password
-# is also set so the TTYs / su work. SECURITY: this is a live rescue image with
-# a well-known password; do not expose it to untrusted networks or enable the
-# RDP/SSH servers on it without changing the password first.
-echo "Configuring live autologin..."
+# the rescue tools need root (dd, mount, shred, fdisk, ...). a known root
+# password is set so you can log in at the greeter and on the TTYs. SECURITY:
+# this is a live rescue image with a well-known password; do not expose it to
+# untrusted networks or enable the RDP/SSH servers without changing it first.
+# (to boot straight to the desktop with no prompt instead, uncomment autologin.)
+echo "Configuring live login..."
 echo "root:nexusb" | chroot "$WORK_DIR" chpasswd
 
 mkdir -p "$WORK_DIR/etc/lxdm"
 cat > "$WORK_DIR/etc/lxdm/lxdm.conf" << 'EOF'
 [base]
-# autologin straight into the desktop, no prompt
-autologin=root
+# autologin=root
 session=/usr/bin/openbox-session
 greeter=/usr/lib/lxdm/lxdm-greeter-gtk
 
@@ -122,5 +121,29 @@ if convert -size 460x110 xc:none -gravity center \
 else
     echo "Warning: could not render login banner (convert failed)"
 fi
+
+# Style the greeter: white label text (the dark background hides the default
+# dark labels) and center the login box. lxdm updates the prompt text with
+# set_text at runtime, which preserves Pango attributes, so the white colour
+# survives the User: -> Password: switch. Edits are additive and no-op if a
+# theme's markup doesn't match, so they can't break the greeter.
+echo "Styling the login greeter..."
+for theme_dir in "$WORK_DIR"/usr/share/lxdm/themes/*/; do
+    [ -d "$theme_dir" ] || continue
+    for ui in greeter.ui greeter-gtk3.ui; do
+        ui_file="$theme_dir/$ui"
+        [ -f "$ui_file" ] || continue
+        # white text for the prompt and the bottom-bar labels
+        for label_id in prompt label2 label_lang label_keyboard time; do
+            perl -0777 -i -pe \
+                "s{(<object class=\"GtkLabel\" id=\"$label_id\">.*?)</object>}{\$1<attributes><attribute name=\"foreground\" value=\"#FFFFFF\"></attribute></attributes></object>}s" \
+                "$ui_file" 2>/dev/null || true
+        done
+        # let the login box's cell expand so it sits in the middle of the screen
+        perl -0777 -i -pe \
+            's{<packing>\s*<property name="position">1</property>\s*</packing>\s*</child>\s*<child>\s*<object class="GtkEventBox" id="bottom_pane">}{<packing><property name="expand">True</property><property name="fill">True</property><property name="position">1</property></packing></child><child><object class="GtkEventBox" id="bottom_pane">}s' \
+            "$ui_file" 2>/dev/null || true
+    done
+done
 
 echo "Professional GUI installed"
