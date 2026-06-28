@@ -330,7 +330,7 @@ while true; do
                     2) 
                         read -p "Delete ALL quarantined files? (yes/no): " confirm
                         if [ "$confirm" = "yes" ]; then
-                            rm -rf "$QUARANTINE_DIR"/*
+                            rm -rf "${QUARANTINE_DIR:?}"/*
                             echo -e "${GREEN}✓ Quarantine cleared${NC}"
                         fi
                         ;;

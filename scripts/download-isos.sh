@@ -1,7 +1,8 @@
 #!/bin/bash
 # download isos, auto + manual
 
-ISO_DIR="build/isos"
+# build dir can point elsewhere via env (matches build.sh)
+ISO_DIR="${NEXUSB_BUILD_DIR:-build}/isos"
 ISO_CONF="config/iso-collection.conf"
 
 mkdir -p "$ISO_DIR"/{Linux,Security,Rescue,Antivirus,Windows,Tools}

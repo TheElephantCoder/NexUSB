@@ -1,18 +1,28 @@
 #!/bin/bash
 # multi-partition usb image
 
+set -e
+set -o pipefail
+
 OUTPUT_IMG=$1
 SIZE_GB=${2:-32}
+
+if [ -z "$OUTPUT_IMG" ]; then
+    echo "Usage: $0 <output.img> [size_gb]" >&2
+    exit 1
+fi
+
+# build dir can point elsewhere via env (matches build.sh)
+BUILD_DIR="${NEXUSB_BUILD_DIR:-build}"
+LIVE_SRC="$BUILD_DIR/iso"
+WINDOWS_SRC="$BUILD_DIR/windows-tools"
+ISO_SRC="$BUILD_DIR/isos"
 
 echo "Creating multi-partition USB image..."
 echo "Size: ${SIZE_GB}GB"
 
-# partition sizes
-BOOT_SIZE=512M
-NEX_SIZE=8G
-WINDOWS_SIZE=8G
+# iso partition gets the rest of the disk after boot/live/windows (~16G)
 ISO_SIZE=$((SIZE_GB - 16))G
-DATA_SIZE=remaining
 
 # blank image
 dd if=/dev/zero of="$OUTPUT_IMG" bs=1M count=$((SIZE_GB * 1024)) status=progress
@@ -45,6 +55,20 @@ if [ -z "$LOOP_DEV" ]; then
 fi
 echo "Created loop device: $LOOP_DEV"
 
+# private mount root + cleanup on every exit path (don't touch host /mnt)
+MNT_BASE=$(mktemp -d /tmp/nexusb-multiboot.XXXXXX)
+cleanup() {
+    cd / 2>/dev/null || true
+    for m in isos windows live boot; do
+        if mountpoint -q "$MNT_BASE/$m" 2>/dev/null; then
+            umount "$MNT_BASE/$m" 2>/dev/null || true
+        fi
+    done
+    [ -n "$LOOP_DEV" ] && losetup -d "$LOOP_DEV" 2>/dev/null || true
+    rm -rf "$MNT_BASE" 2>/dev/null || true
+}
+trap cleanup EXIT
+
 partprobe "$LOOP_DEV"
 
 # wait for partition nodes before formatting
@@ -58,7 +82,6 @@ for i in 1 2 3 4; do
     done
     if [ ! -b "$part" ]; then
         echo "Error: Partition $part did not appear in time"
-        losetup -d "$LOOP_DEV"
         exit 1
     fi
 done
@@ -71,23 +94,31 @@ mkfs.ntfs -f -L "WINTOOLS" "${LOOP_DEV}p3"
 mkfs.exfat -n "ISOS" "${LOOP_DEV}p4"
 
 # mount + populate
-mkdir -p /mnt/{boot,live,windows,isos}
-mount "${LOOP_DEV}p1" /mnt/boot
-mount "${LOOP_DEV}p2" /mnt/live
-mount "${LOOP_DEV}p3" /mnt/windows
-mount "${LOOP_DEV}p4" /mnt/isos
+mkdir -p "$MNT_BASE"/{boot,live,windows,isos}
+mount "${LOOP_DEV}p1" "$MNT_BASE/boot"    || { echo "Error: failed to mount ${LOOP_DEV}p1"; exit 1; }
+mount "${LOOP_DEV}p2" "$MNT_BASE/live"    || { echo "Error: failed to mount ${LOOP_DEV}p2"; exit 1; }
+mount "${LOOP_DEV}p3" "$MNT_BASE/windows" || { echo "Error: failed to mount ${LOOP_DEV}p3"; exit 1; }
+mount "${LOOP_DEV}p4" "$MNT_BASE/isos"    || { echo "Error: failed to mount ${LOOP_DEV}p4"; exit 1; }
 
 # copy live system
 echo "Copying NexUSB system..."
-cp -r build/iso/* /mnt/live/
+if [ -d "$LIVE_SRC" ]; then
+    cp -r "$LIVE_SRC"/. "$MNT_BASE/live/"
+else
+    echo "Warning: live system source '$LIVE_SRC' not found; live partition left empty"
+fi
 
 # copy windows tools
 echo "Copying Windows tools..."
-cp -r build/windows-tools/* /mnt/windows/
+if [ -d "$WINDOWS_SRC" ]; then
+    cp -r "$WINDOWS_SRC"/. "$MNT_BASE/windows/"
+else
+    echo "Warning: Windows tools source '$WINDOWS_SRC' not found; windows partition left empty"
+fi
 
 # ventoy for multiboot
 echo "Installing Ventoy for multiboot..."
-cd /mnt/isos
+cd "$MNT_BASE/isos" || { echo "Error: failed to enter ISO partition"; exit 1; }
 mkdir -p ventoy
 cat > ventoy/ventoy.json << 'EOF'
 {
@@ -122,6 +153,12 @@ EOF
 
 mkdir -p ISOs/{Linux,Security,Rescue,Antivirus,Windows,Tools}
 
+# copy any ISOs already downloaded into build/isos into the collection
+if [ -d "$ISO_SRC" ] && [ -n "$(ls -A "$ISO_SRC" 2>/dev/null)" ]; then
+    echo "Copying downloaded ISOs..."
+    cp -r "$ISO_SRC"/. ISOs/
+fi
+
 # readme
 cat > README.txt << 'EOF'
 NexUSB - ISO Collection
@@ -137,10 +174,10 @@ Place your ISO files in the appropriate subdirectories:
 The system will automatically detect and boot from any ISO placed here.
 EOF
 
-# cleanup
+# unmount + detach (also handled by the EXIT trap)
 cd /
-umount /mnt/{boot,live,windows,isos}
-losetup -d "$LOOP_DEV"
+cleanup
+trap - EXIT
 
 echo "Multi-partition image created: $OUTPUT_IMG"
 echo ""

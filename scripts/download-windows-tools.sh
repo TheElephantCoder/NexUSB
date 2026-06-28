@@ -1,7 +1,8 @@
 #!/bin/bash
 # download windows portable tools
 
-WINDOWS_DIR="build/windows-tools"
+# build dir can point elsewhere via env (matches build.sh)
+WINDOWS_DIR="${NEXUSB_BUILD_DIR:-build}/windows-tools"
 TOOLS_CONF="config/windows-tools.conf"
 
 echo "Creating Windows tools directory..."
