@@ -54,6 +54,7 @@ if [ -n "${NEXUSB_ASSUME_YES:-}" ]; then
         --privileged \
         -e NEXUSB_ASSUME_YES=1 \
         -e NEXUSB_ARCH="$ARCH" \
+        -e NEXUSB_SKIP_PROPRIETARY="${NEXUSB_SKIP_PROPRIETARY:-}" \
         -v "$REPO_ROOT":/src:ro \
         -v "$OUT_DIR":/out \
         "$IMAGE" \
@@ -63,6 +64,7 @@ else
         --platform "linux/$ARCH" \
         --privileged \
         -e NEXUSB_ARCH="$ARCH" \
+        -e NEXUSB_SKIP_PROPRIETARY="${NEXUSB_SKIP_PROPRIETARY:-}" \
         -v "$REPO_ROOT":/src:ro \
         -v "$OUT_DIR":/out \
         "$IMAGE" \
