@@ -66,6 +66,11 @@ cp "$WORK_DIR/usr/share/applications/NexUSB.desktop" \
 # openbox launches the gui
 mkdir -p "$WORK_DIR/etc/xdg/openbox"
 cat > "$WORK_DIR/etc/xdg/openbox/autostart" << 'EOF'
+# rescue env: never blank, screensave, or DPMS-off the display
+xset s off
+xset s noblank
+xset -dpms
+
 # Set wallpaper
 feh --bg-scale /usr/share/NexUSB/icons/background.png &
 
@@ -102,6 +107,26 @@ if [ -f "$WORK_DIR/etc/pam.d/lxdm" ]; then
     sed -i 's/^\(auth.*pam_succeed_if.*user.*!= *root.*\)/# \1/' \
         "$WORK_DIR/etc/pam.d/lxdm" 2>/dev/null || true
 fi
+
+# --- power: never suspend ---
+# a rescue session must not sleep (a half-working s2idle on some laptops, e.g.
+# Lenovo IdeaPads, leaves the EC cycling the fan at max). mask the sleep
+# targets and tell logind to ignore the lid, power/suspend keys, and idle.
+echo "Disabling suspend/sleep for the live session..."
+for unit in sleep.target suspend.target hibernate.target hybrid-sleep.target; do
+    ln -sf /dev/null "$WORK_DIR/etc/systemd/system/$unit"
+done
+mkdir -p "$WORK_DIR/etc/systemd/logind.conf.d"
+cat > "$WORK_DIR/etc/systemd/logind.conf.d/nexusb-nosleep.conf" << 'EOF'
+[Login]
+HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+HandleLidSwitchDocked=ignore
+HandleSuspendKey=ignore
+HandleHibernateKey=ignore
+HandlePowerKey=ignore
+IdleAction=ignore
+EOF
 
 # Brand the greeter: the lxdm GTK themes show a top image (login.png) and have
 # no title label, so render a "NexUSB Login" banner and drop it in as login.png
