@@ -97,6 +97,18 @@ Intel Macs, and Linux.
 - A container runtime: Docker Desktop, OrbStack, or colima
 - ~15GB free disk space for the minimal build
 
+On macOS you can install everything with the bundled `Brewfile`:
+
+```bash
+brew bundle --file=Brewfile          # installs colima, docker, qemu
+colima start --vm-type qemu --cpu 4 --memory 8 --disk 60
+```
+
+Use the **QEMU** vm-type for `amd64` builds: Apple's Rosetta cannot run the
+amd64 `dpkg`/`debootstrap` reliably (it crashes mid-build), whereas QEMU user
+emulation handles it. The NexUSB Flasher app runs `brew bundle` and starts
+colima for you automatically before a build.
+
 ### Build
 
 ```bash
