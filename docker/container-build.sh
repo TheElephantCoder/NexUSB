@@ -43,7 +43,11 @@ esac
 
 echo ">> Copying artifacts to /out ..."
 mkdir -p /out
-if ! cp -av dist/. /out/ 2>/dev/null; then
+# plain recursive copy; -a/--preserve fails on the virtiofs bind mount (can't
+# set ownership), so don't preserve attrs and judge success by the files that
+# actually land in /out rather than cp's exit status.
+cp -rv dist/. /out/ 2>/dev/null || true
+if ! ls /out/*.iso /out/*.img >/dev/null 2>&1; then
     echo "Error: no artifacts found in /build/dist" >&2
     exit 1
 fi
