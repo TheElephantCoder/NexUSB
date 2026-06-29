@@ -47,8 +47,14 @@ mkdir -p /out
 # set ownership), so don't preserve attrs and judge success by the files that
 # actually land in /out rather than cp's exit status.
 cp -rv dist/. /out/ 2>/dev/null || true
-if ! ls /out/*.iso /out/*.img >/dev/null 2>&1; then
-    echo "Error: no artifacts found in /build/dist" >&2
+# success = at least one artifact landed in /out. check each kind separately:
+# 'ls a b' fails if either glob is empty, so the minimal build (iso, no img)
+# would falsely report failure if both were listed in one ls.
+shopt -s nullglob
+produced=(/out/*.iso /out/*.img)
+shopt -u nullglob
+if [ ${#produced[@]} -eq 0 ]; then
+    echo "Error: no artifacts found in /out (build may have failed)" >&2
     exit 1
 fi
 

@@ -65,13 +65,27 @@ sudo apt install -y debootstrap grub2-common grub-pc-bin grub-efi-amd64-bin \
 
 ### On macOS or any host (Docker)
 
+First-time setup on macOS — install the host tools and start a Linux VM. Use the
+QEMU backend, since Rosetta can't run the amd64 `dpkg`/`debootstrap` reliably:
+
 ```bash
-./docker/build-in-docker.sh minimal "" arm64    # native arm64 on Apple Silicon
-./docker/build-in-docker.sh full 32 amd64
+brew bundle --file=Brewfile                       # colima, docker, qemu
+colima start --vm-type qemu --cpu 4 --memory 8 --disk 60
+```
+
+Then build:
+
+```bash
+./docker/build-in-docker.sh minimal               # minimal ISO, amd64 (default)
+./docker/build-in-docker.sh minimal "" arm64      # native arm64 on Apple Silicon
+./docker/build-in-docker.sh full 32 amd64         # full 32 GB image
 ```
 
 The container's architecture matches the target, so on Apple Silicon an arm64
-build runs natively and an amd64 build runs emulated (slower).
+build runs natively and an amd64 build runs emulated (slower). Finished images
+land in `dist/`. The minimal target is the dependable one in a container; the
+full image's partitioning step is unreliable inside Docker (use a real Linux VM
+for that).
 
 ### On Windows 11 (via WSL2)
 
@@ -95,14 +109,21 @@ More detail is in [BUILD.md](BUILD.md).
 
 ## Flashing
 
+Find the USB device first (`lsblk` on Linux, `diskutil list` on macOS), then
+write the image to the whole disk — not a partition. This erases the target
+drive, so double-check the device name.
+
 ```bash
-sudo dd if=dist/NexUSB-Minimal.iso of=/dev/sdX bs=4M status=progress
+# Linux
+sudo dd if=dist/NexUSB-Minimal.iso of=/dev/sdX bs=4M status=progress && sync
+
+# macOS (the raw r-disk node is much faster)
+sudo dd if=dist/NexUSB-Minimal.iso of=/dev/rdiskX bs=1m
 ```
 
-On macOS there's also a small companion app, **NexUSB Flasher** (in
-`NexUSB-Flasher/`, kept in its own repository), which can build images via
-Docker and flash them to a USB drive through a step-by-step interface. On
-Windows, Rufus or balenaEtcher work.
+On Windows, [Rufus](https://rufus.ie/) or
+[balenaEtcher](https://www.balena.io/etcher/) do the same job with a GUI.
+Etcher also works on Linux and macOS if you'd rather not use `dd`.
 
 ## Requirements
 

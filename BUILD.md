@@ -81,9 +81,8 @@ here erases or formats a disk. Point `NEXUSB_BUILD_DIR` at a dedicated
 subdirectory, not a volume root: the build refuses obviously-dangerous targets
 (`/`, `$HOME`, a mount root) precisely because that dir is `rm -rf`'d each run.
 
-For the container build, `NEXUSB_DIST_DIR` (or the Flasher app's "Output folder")
-relocates the **output**; the container's intermediate files still use Docker's
-own disk.
+For the container build, `NEXUSB_DIST_DIR` relocates the **output**; the
+container's intermediate files still use Docker's own disk.
 
 ## Building on macOS / Apple Silicon
 
@@ -106,8 +105,8 @@ colima start --vm-type qemu --cpu 4 --memory 8 --disk 60
 
 Use the **QEMU** vm-type for `amd64` builds: Apple's Rosetta cannot run the
 amd64 `dpkg`/`debootstrap` reliably (it crashes mid-build), whereas QEMU user
-emulation handles it. The NexUSB Flasher app runs `brew bundle` and starts
-colima for you automatically before a build.
+emulation handles it. Start colima with `--vm-type qemu` before building, as
+shown above.
 
 ### Build
 

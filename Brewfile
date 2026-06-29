@@ -2,11 +2,11 @@
 #
 # These are the host tools the containerised Linux build needs. Install with:
 #   brew bundle --file=Brewfile
-# The NexUSB Flasher app runs this automatically before a build.
 #
 # Note: the build runs amd64 containers under QEMU emulation. Rosetta cannot
 # run the amd64 dpkg/debootstrap reliably, so colima must be started with
-# --vm-type qemu (the Flasher does this for you).
+# --vm-type qemu:
+#   colima start --vm-type qemu --cpu 4 --memory 8 --disk 60
 
 brew "colima"   # lightweight Linux VM + Docker runtime for macOS
 brew "docker"   # docker CLI (talks to the colima daemon)

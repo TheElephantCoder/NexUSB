@@ -48,7 +48,7 @@ mkdir -p "$OUT_DIR"
 
 echo ">> [2/2] Running '$TARGET' build (linux/$ARCH) ..."
 if [ -n "${NEXUSB_ASSUME_YES:-}" ]; then
-    # no tty (e.g. launched from the Flasher app); auto-confirm prompts
+    # no tty (e.g. CI or a non-interactive shell); auto-confirm prompts
     docker run --rm \
         --platform "linux/$ARCH" \
         --privileged \
