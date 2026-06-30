@@ -16,6 +16,9 @@ class NexUSBApp(Gtk.Window):
         Gtk.Window.__init__(self, title="NexUSB Toolkit")
         self.set_default_size(1000, 700)
         self.set_position(Gtk.WindowPosition.CENTER)
+        # boot straight into the toolkit: fill the screen rather than float as
+        # a small window on the desktop
+        self.maximize()
         
         # window icon, ignore if missing
         try:

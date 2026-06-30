@@ -12,12 +12,13 @@ chroot "$WORK_DIR" apt install -y \
     gir1.2-gtk-3.0 \
     gir1.2-gdkpixbuf-2.0
 
-# icons + fonts
+# icons + fonts + wallpaper setter
 chroot "$WORK_DIR" apt install -y \
     papirus-icon-theme \
     fonts-dejavu \
     fonts-liberation \
     imagemagick \
+    feh \
     wget
 
 # icons dir
@@ -80,17 +81,19 @@ EOF
 
 # --- live login ---
 # the rescue tools need root (dd, mount, shred, fdisk, ...). a known root
-# password is set so you can log in at the greeter and on the TTYs. SECURITY:
-# this is a live rescue image with a well-known password; do not expose it to
-# untrusted networks or enable the RDP/SSH servers without changing it first.
-# (to boot straight to the desktop with no prompt instead, uncomment autologin.)
+# password is still set so you can log in on the TTYs and so the RDP/SSH
+# servers have a credential. SECURITY: this is a live rescue image with a
+# well-known password; do not expose it to untrusted networks or enable the
+# RDP/SSH servers without changing it first.
+# The session autologins as root straight into the toolkit GUI (no greeter).
+# To require a login prompt instead, comment out the autologin line below.
 echo "Configuring live login..."
 echo "root:nexusb" | chroot "$WORK_DIR" chpasswd
 
 mkdir -p "$WORK_DIR/etc/lxdm"
 cat > "$WORK_DIR/etc/lxdm/lxdm.conf" << 'EOF'
 [base]
-# autologin=root
+autologin=root
 session=/usr/bin/openbox-session
 greeter=/usr/lib/lxdm/lxdm-greeter-gtk
 
