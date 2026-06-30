@@ -1,7 +1,9 @@
 #!/bin/bash
 # preflight env check
-
-set -e
+# NOTE: no `set -e` here on purpose. this script tallies ERRORS/WARNINGS via
+# helper functions that return non-zero when a tool is missing, then decides
+# pass/fail at the summary. set -e would abort on the first missing tool
+# (e.g. an optional one like python3) before the summary ever runs.
 
 echo "=== NexUSB Environment Check ==="
 echo ""
@@ -28,7 +30,7 @@ check_command() {
         return 0
     else
         echo -e "${RED}✗${NC} $cmd not found (install: $package)"
-        ((ERRORS++))
+        ERRORS=$((ERRORS + 1))
         return 1
     fi
 }
@@ -43,7 +45,7 @@ check_optional() {
         return 0
     else
         echo -e "${YELLOW}⚠${NC} $cmd not found (optional: $package)"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
         return 1
     fi
 }
@@ -88,10 +90,10 @@ if [ "$AVAILABLE" -ge 50 ]; then
     echo -e "${GREEN}✓${NC} $AVAILABLE GB available (50+ GB recommended)"
 elif [ "$AVAILABLE" -ge 20 ]; then
     echo -e "${YELLOW}⚠${NC} $AVAILABLE GB available (50+ GB recommended)"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 else
     echo -e "${RED}✗${NC} Only $AVAILABLE GB available (need at least 20 GB)"
-    ((ERRORS++))
+    ERRORS=$((ERRORS + 1))
 fi
 echo ""
 
@@ -103,10 +105,10 @@ if [ "$TOTAL_MEM" -ge 4 ]; then
     echo -e "${GREEN}✓${NC} ${TOTAL_MEM}GB RAM (4+ GB recommended)"
 elif [ "$TOTAL_MEM" -ge 2 ]; then
     echo -e "${YELLOW}⚠${NC} ${TOTAL_MEM}GB RAM (4+ GB recommended)"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 else
     echo -e "${RED}✗${NC} Only ${TOTAL_MEM}GB RAM (need at least 2 GB)"
-    ((ERRORS++))
+    ERRORS=$((ERRORS + 1))
 fi
 echo ""
 
@@ -116,7 +118,7 @@ if ping -c 1 8.8.8.8 &> /dev/null; then
     echo -e "${GREEN}✓${NC} Internet connection available"
 else
     echo -e "${YELLOW}⚠${NC} No internet connection (needed for downloads)"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 fi
 echo ""
 
@@ -132,10 +134,10 @@ if [ "$ARCH" = "$EXPECTED_HOST" ]; then
 elif [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "aarch64" ]; then
     echo -e "${YELLOW}⚠${NC} host is $ARCH but target is $NEXUSB_ARCH — cross-build"
     echo -e "    needs qemu-user-static + binfmt (or build in a native container)"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 else
     echo -e "${RED}✗${NC} Unsupported host architecture: $ARCH"
-    ((ERRORS++))
+    ERRORS=$((ERRORS + 1))
 fi
 echo ""
 
@@ -149,11 +151,11 @@ if [ -f /etc/os-release ]; then
         echo -e "${GREEN}✓${NC} Supported OS"
     else
         echo -e "${YELLOW}⚠${NC} Untested OS (Ubuntu/Debian recommended)"
-        ((WARNINGS++))
+        WARNINGS=$((WARNINGS + 1))
     fi
 else
     echo -e "${YELLOW}⚠${NC} Unknown OS"
-    ((WARNINGS++))
+    WARNINGS=$((WARNINGS + 1))
 fi
 echo ""
 
