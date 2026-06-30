@@ -112,9 +112,13 @@ else
 fi
 echo ""
 
-# net check
+# net check — probe with wget (what the build actually uses to download, and
+# what's present in the container). ping is unreliable here: iputils isn't
+# installed in the build image and ICMP is often blocked in container networks.
 echo "Checking internet connection..."
-if ping -c 1 8.8.8.8 &> /dev/null; then
+if wget -q --spider --timeout=5 --tries=1 https://archive.ubuntu.com/ 2>/dev/null \
+   || wget -q --spider --timeout=5 --tries=1 https://deb.debian.org/ 2>/dev/null \
+   || ping -c 1 -W 2 8.8.8.8 &> /dev/null; then
     echo -e "${GREEN}✓${NC} Internet connection available"
 else
     echo -e "${YELLOW}⚠${NC} No internet connection (needed for downloads)"
