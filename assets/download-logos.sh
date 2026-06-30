@@ -27,8 +27,10 @@ download_logo() {
     
     echo -n "  Downloading $name... "
     
-    # try download
-    if wget -q --timeout=10 --tries=2 -O "/tmp/${name}_temp" "$url" 2>/dev/null; then
+    # try download (descriptive UA: Wikimedia and some CDNs reject blank/default ones)
+    if wget -q --timeout=15 --tries=2 \
+        -U "NexUSB-build/1.0 (+https://github.com/TheElephantCoder/NexUSB)" \
+        -O "/tmp/${name}_temp" "$url" 2>/dev/null; then
         # to 64x64 png
         if convert "/tmp/${name}_temp" -resize 64x64 -background none -gravity center -extent 64x64 "$output" 2>/dev/null; then
             echo "✓"
@@ -61,8 +63,8 @@ create_fallback() {
 }
 
 echo "[1/5] Downloading Security Tool Logos..."
-download_logo "clamav" "https://www.clamav.net/assets/clamav-trademark.png"
-download_logo "wireshark" "https://gitlab.com/wireshark/wireshark/-/raw/master/image/wsicon64.png"
+download_logo "clamav" "https://commons.wikimedia.org/wiki/Special:FilePath/ClamAV_Logo.png?width=128"
+download_logo "wireshark" "https://commons.wikimedia.org/wiki/Special:FilePath/Wireshark_icon.svg?width=128"
 download_logo "nmap" "https://nmap.org/images/nmap-logo-256x256.png"
 create_fallback "chkrootkit" "R" "#cc0000"
 create_fallback "rkhunter" "RK" "#990000"
@@ -72,7 +74,7 @@ create_fallback "aircrack" "A" "#0099cc"
 
 echo ""
 echo "[2/5] Downloading Recovery Tool Logos..."
-download_logo "gparted" "https://gparted.org/gparted-128.png"
+download_logo "gparted" "https://commons.wikimedia.org/wiki/Special:FilePath/Scalable_gparted.svg?width=128"
 create_fallback "testdisk" "TD" "#00cc66"
 create_fallback "photorec" "PR" "#00cc66"
 create_fallback "clonezilla" "CZ" "#009933"
@@ -82,8 +84,8 @@ create_fallback "bootrepair" "BR" "#6600cc"
 
 echo ""
 echo "[3/5] Downloading Remote Access Logos..."
-download_logo "remmina" "https://gitlab.com/Remmina/Remmina/-/raw/master/data/desktop/scalable/apps/org.remmina.Remmina.svg"
-download_logo "teamviewer" "https://www.teamviewer.com/etc.clientlibs/teamviewer/clientlibs/clientlib-resources/resources/img/logo/teamviewer-logo-blue.svg"
+download_logo "remmina" "https://commons.wikimedia.org/wiki/Special:FilePath/Org.remmina.Remmina.svg?width=128"
+download_logo "teamviewer" "https://commons.wikimedia.org/wiki/Special:FilePath/TeamViewer_Icon.svg?width=128"
 create_fallback "anydesk" "AD" "#cc0000"
 create_fallback "vnc" "VNC" "#0066cc"
 create_fallback "ssh" "SSH" "#009900"
@@ -92,8 +94,8 @@ create_fallback "xrdp" "X" "#0099cc"
 
 echo ""
 echo "[4/5] Downloading System Tool Logos..."
-download_logo "firefox" "https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo.svg"
-download_logo "vlc" "https://images.videolan.org/images/vlc-icon.png"
+download_logo "firefox" "https://commons.wikimedia.org/wiki/Special:FilePath/Firefox_logo,_2019.svg?width=128"
+download_logo "vlc" "https://commons.wikimedia.org/wiki/Special:FilePath/VLC_Icon.svg?width=128"
 create_fallback "hardinfo" "HW" "#0066cc"
 create_fallback "htop" "H" "#00cc00"
 create_fallback "lshw" "L" "#6666cc"
