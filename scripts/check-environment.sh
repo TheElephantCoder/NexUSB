@@ -76,7 +76,6 @@ echo ""
 
 # optional tools
 echo "Checking optional tools..."
-check_optional "git" "git"
 check_optional "python3" "python3"
 check_optional "dialog" "dialog"
 echo ""
